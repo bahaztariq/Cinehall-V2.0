@@ -12,6 +12,21 @@ class GenreSeeder extends Seeder
      */
     public function run(): void
     {
-        //
+        $genres = [
+            ['name' => 'Action'],
+            ['name' => 'Comedy'],
+            ['name' => 'Drama'],
+            ['name' => 'Horror'],
+            ['name' => 'Sci-Fi'],
+            ['name' => 'Romance'],
+            ['name' => 'Thriller'],
+            ['name' => 'Animation'],
+            ['name' => 'Documentary'],
+            ['name' => 'Adventure'],
+        ];
+
+        foreach ($genres as $genre) {
+            \App\Models\genre::updateOrCreate($genre);
+        }
     }
 }
