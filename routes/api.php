@@ -6,6 +6,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\ReservationController;
 use App\Http\Controllers\TicketController;
 use App\Http\Controllers\FilmController;
+use App\Http\Controllers\FavouriteController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\SessionController;
@@ -17,7 +18,7 @@ use App\Http\Controllers\GenreController;
 Route::prefix('v1')->group(function () {
 
     // --- PUBLIC ROUTES ---
-    Route::post('/login', [AuthController::class, 'login']);
+    Route::post('/login', [AuthController::class, 'login'])->name('login');
     Route::post('/register', [AuthController::class, 'register']);
 
     // Public Genres
@@ -82,6 +83,12 @@ Route::prefix('v1')->group(function () {
             'update'  => 'reservations.update',
             'destroy' => 'reservations.destroy',
         ]);
+
+        // Favourites
+        Route::get('/favourites', [FavouriteController::class, 'index']);
+        Route::post('/favourites/toggle', [FavouriteController::class, 'toggle']);
+        Route::get('/favourites/check/{film}', [FavouriteController::class, 'check']);
+        Route::delete('/favourites/{favourite}', [FavouriteController::class, 'destroy']);
 
         // Tickets
         Route::get('/tickets/{ticketId}/download', [TicketController::class, 'donwloadReceipt']);
