@@ -40,7 +40,7 @@ class RoomController extends Controller
     )]
     public function show(Room $room)
     {
-        return response()->json($room->load('seats'));
+        return response()->json(['room' => $room->load('seats')]);
     }
 
     #[OA\Post(
