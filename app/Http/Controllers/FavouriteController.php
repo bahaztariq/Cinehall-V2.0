@@ -2,69 +2,71 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\StorefavouriteRequest;
-use App\Http\Requests\UpdatefavouriteRequest;
 use App\Models\favourite;
-
-use OpenApi\Attributes as OA;
+use App\Models\Film;
+use Illuminate\Http\Request;
 
 class FavouriteController extends Controller
 {
-    #[OA\Tag(name: "Favourites", description: "User favourite films")]
-
     /**
-     * Display a listing of the resource.
+     * List authenticated user's favourite films.
      */
-    public function index()
+    public function index(Request $request)
     {
-        //
+        $favourites = favourite::with(['film.genres', 'film.image'])
+            ->where('user_id', auth()->id())
+            ->latest()
+            ->get();
+
+        return response()->json(['favourites' => $favourites]);
     }
 
     /**
-     * Show the form for creating a new resource.
+     * Toggle a film in/out of favourites.
      */
-    public function create()
+    public function toggle(Request $request)
     {
-        //
+        $request->validate(['film_id' => 'required|exists:films,id']);
+
+        $existing = favourite::where('user_id', auth()->id())
+            ->where('film_id', $request->film_id)
+            ->first();
+
+        if ($existing) {
+            $existing->delete();
+            return response()->json(['message' => 'Removed from favourites', 'is_favourite' => false]);
+        }
+
+        favourite::create([
+            'user_id' => auth()->id(),
+            'film_id' => $request->film_id,
+        ]);
+
+        return response()->json(['message' => 'Added to favourites', 'is_favourite' => true]);
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Check if a specific film is favourited by the user.
      */
-    public function store(StorefavouriteRequest $request)
+    public function check(Film $film)
     {
-        //
+        $isFavourite = favourite::where('user_id', auth()->id())
+            ->where('film_id', $film->id)
+            ->exists();
+
+        return response()->json(['is_favourite' => $isFavourite]);
     }
 
     /**
-     * Display the specified resource.
-     */
-    public function show(favourite $favourite)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(favourite $favourite)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(UpdatefavouriteRequest $request, favourite $favourite)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
+     * Remove a specific favourite.
      */
     public function destroy(favourite $favourite)
     {
-        //
+        if ($favourite->user_id !== auth()->id()) {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
+
+        $favourite->delete();
+        return response()->json(['message' => 'Removed from favourites']);
     }
 }
