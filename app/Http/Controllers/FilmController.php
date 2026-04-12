@@ -42,7 +42,7 @@ class FilmController extends Controller
     )]
     public function show(Film $film)
     {
-        return response()->json($film->load(['genres', 'image']));
+        return response()->json(['film' => $film->load(['genres', 'image'])]);
     }
 
     #[OA\Post(
