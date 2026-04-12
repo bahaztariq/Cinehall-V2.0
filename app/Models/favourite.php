@@ -25,4 +25,14 @@ class favourite extends Model
     use HasFactory;
 
     protected $fillable = ['user_id', 'film_id'];
+
+    public function film()
+    {
+        return $this->belongsTo(Film::class);
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 }
