@@ -20,12 +20,11 @@ class SessionController extends Controller
     )]
     public function index()
     {
-
         $sessions = session::with(['film', 'room'])
             ->orderBy('start_time', 'asc')
-            ->paginate(15);
+            ->get();
 
-        return response()->json($sessions);
+        return response()->json(['film_sessions' => $sessions]);
     }
 
     #[OA\Get(
@@ -42,7 +41,7 @@ class SessionController extends Controller
     )]
     public function show(session $filmSession)
     {
-        return response()->json($filmSession->load(['film', 'room']));
+        return response()->json(['film_session' => $filmSession->load(['film', 'room'])]);
     }
 
     #[OA\Post(
