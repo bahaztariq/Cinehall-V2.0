@@ -25,11 +25,12 @@ class ReservationController extends Controller
     )]
     public function index()
     {
-        $reservations = reservation::with(['session.film', 'seat'])
+        $reservations = reservation::with(['session.film.image', 'session.room', 'seat'])
             ->where('user_id', auth()->id())
+            ->latest()
             ->get();
 
-        return response()->json($reservations);
+        return response()->json(['reservations' => $reservations]);
     }
 
     /**
