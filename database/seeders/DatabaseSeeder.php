@@ -17,14 +17,20 @@ class DatabaseSeeder extends Seeder
     {
         // User::factory(10)->create();
 
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
-        ]);
+        // Seeded admin account for local dev: test@example.com / password
+        User::updateOrCreate(
+            ['email' => 'test@example.com'],
+            [
+                'name'     => 'Admin User',
+                'password' => \Illuminate\Support\Facades\Hash::make('password'),
+                'is_admin' => true,
+                'status'   => 'active',
+            ]
+        );
 
         $this->call([
             GenreSeeder::class,
-            FilmSeeder::class,
+            RealMoviesSeeder::class,
         ]);
     }
 }
