@@ -29,7 +29,12 @@ class Film extends Model
     /** @use HasFactory<\Database\Factories\FilmFactory> */
     use HasFactory;
 
-    protected $fillable = ['title', 'description', 'duration', 'rate', 'trailer'];
+    protected $fillable = ['title', 'description', 'duration', 'rate', 'trailer', 'backdrop', 'cast', 'coming_soon'];
+
+    protected $casts = [
+        'cast' => 'array',
+        'coming_soon' => 'boolean'
+    ];
 
     public function session(): HasMany
     {
