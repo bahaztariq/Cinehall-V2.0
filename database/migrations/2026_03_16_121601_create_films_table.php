@@ -21,10 +21,13 @@ return new class extends Migration
         Schema::create('films', function (Blueprint $table) {
             $table->id();
             $table->string('title');
-            $table->string('description');
+            $table->text('description');
             $table->decimal('duration');
             $table->enum('rate',['G' , 'PG' , 'PG-13' , 'R' , 'NC-17'])->default('G');
             $table->string('trailer')->nullable();
+            $table->string('backdrop')->nullable();
+            $table->json('cast')->nullable();
+            $table->boolean('coming_soon')->default(false);
             $table->timestamps();
         });
 
