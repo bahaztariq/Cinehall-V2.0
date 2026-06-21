@@ -30,6 +30,7 @@ class StoreFilmRequest extends AdminFormRequest
             'genres'      => ['required', 'array', 'min:1'],
             'genres.*'    => ['exists:genres,id'],
             'image'       => ['required', 'image', 'mimes:jpg,jpeg,png', 'max:4096'],
+            'coming_soon' => ['sometimes', 'boolean'],
         ];
     }
 

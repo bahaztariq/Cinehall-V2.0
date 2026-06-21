@@ -30,6 +30,7 @@ class UpdateFilmRequest extends AdminFormRequest
             'genres'      => ['sometimes', 'array', 'min:1'],
             'genres.*'    => ['exists:genres,id'],
             'image'       => ['nullable', 'image', 'mimes:jpg,jpeg,png', 'max:4096'],
+            'coming_soon' => ['sometimes', 'boolean'],
         ];
     }
 
