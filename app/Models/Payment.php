@@ -33,5 +33,8 @@ class Payment extends Model
         'transaction_id',
     ];
 
-
+    public function reservation()
+    {
+        return $this->belongsTo(reservation::class);
+    }
 }
