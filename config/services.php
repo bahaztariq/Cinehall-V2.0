@@ -45,6 +45,10 @@ return [
             'yearly' => env('STRIPE_PRICE_YEARLY', 'price_5678'),
         ],
     ],
+
+    'tmdb' => [
+        'key' => env('TMDB_API_KEY'),
+    ],
 ];
 
 
