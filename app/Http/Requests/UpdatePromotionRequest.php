@@ -4,26 +4,25 @@ namespace App\Http\Requests;
 
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Support\Facades\Gate;
 
 class UpdatePromotionRequest extends FormRequest
 {
-    /**
-     * Determine if the user is authorized to make this request.
-     */
     public function authorize(): bool
     {
-        return false;
+        return Gate::allows('admin');
     }
 
     /**
-     * Get the validation rules that apply to the request.
-     *
      * @return array<string, ValidationRule|array<mixed>|string>
      */
     public function rules(): array
     {
         return [
-            //
+            'name'                => ['sometimes', 'string', 'max:255'],
+            'discount_percentage' => ['sometimes', 'numeric', 'min:0', 'max:100'],
+            'start_date'          => ['sometimes', 'date'],
+            'end_date'            => ['sometimes', 'date', 'after_or_equal:start_date'],
         ];
     }
 }
