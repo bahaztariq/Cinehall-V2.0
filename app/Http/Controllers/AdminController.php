@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use App\Models\reservation;
 use App\Models\session;
+use App\Models\Payment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Auth;
@@ -40,8 +41,8 @@ class AdminController extends Controller
                 'total_users'        => User::count(),
                 'total_reservations' => reservation::count(),
                 'pending_reservations'  => reservation::where('status', 'pending')->count(),
+                'accepted_reservations' => reservation::where('status', 'accepted')->count(),
                 'canceled_reservations' => reservation::where('status', 'canceled')->count(),
-                'expired_reservations'  => reservation::where('status', 'expired')->count(),
             ],
 
             'rankings' => [
@@ -52,14 +53,14 @@ class AdminController extends Controller
 
                 'last_six_months' => session::with('film')
                     ->withCount(['reservations' => function ($query) use ($sixMonthsAgo) {
-                        $query->where('reserved_at', '>=', $sixMonthsAgo);
+                        $query->where('created_at', '>=', $sixMonthsAgo);
                     }])
                     ->orderBy('reservations_count', 'desc')
                     ->take(5)->get(),
 
                 'this_month' => session::with('film')
                     ->withCount(['reservations' => function ($query) use ($startOfMonth) {
-                        $query->where('reserved_at', '>=', $startOfMonth);
+                        $query->where('created_at', '>=', $startOfMonth);
                     }])
                     ->orderBy('reservations_count', 'desc')
                     ->take(5)->get(),
@@ -107,6 +108,67 @@ class AdminController extends Controller
         return response()->json([
             'message' => $message,
             'user'    => $user
+        ]);
+    }
+
+    /**
+     * List all bookings (Admin only), optional status filter, paginated.
+     */
+    public function reservations(Request $request)
+    {
+        Gate::authorize('admin');
+
+        $query = reservation::with(['user', 'session.film.image', 'session.room', 'seat'])
+            ->latest();
+
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->whereHas('user', fn ($q) => $q->where('name', 'like', "%{$search}%")->orWhere('email', 'like', "%{$search}%"));
+        }
+
+        return response()->json([
+            'reservations' => $query->paginate(20),
+        ]);
+    }
+
+    /**
+     * Admin cancel any booking (frees the seat).
+     */
+    public function cancelReservation(reservation $reservation)
+    {
+        Gate::authorize('admin');
+
+        $reservation->update(['status' => 'canceled']);
+
+        return response()->json([
+            'message'     => 'Booking canceled.',
+            'reservation' => $reservation->fresh(['user', 'session.film', 'seat']),
+        ]);
+    }
+
+    /**
+     * Payments / revenue overview (Admin only).
+     */
+    public function payments(Request $request)
+    {
+        Gate::authorize('admin');
+
+        $startOfMonth = Carbon::now()->startOfMonth();
+
+        return response()->json([
+            'totals' => [
+                'revenue_all_time' => (float) Payment::where('status', 'completed')->sum('amount'),
+                'revenue_month'    => (float) Payment::where('status', 'completed')->where('created_at', '>=', $startOfMonth)->sum('amount'),
+                'transactions'     => Payment::count(),
+                'completed'        => Payment::where('status', 'completed')->count(),
+                'failed'           => Payment::where('status', 'failed')->count(),
+            ],
+            'payments' => Payment::with(['reservation.user', 'reservation.session.film'])
+                ->latest()
+                ->paginate(20),
         ]);
     }
 }
