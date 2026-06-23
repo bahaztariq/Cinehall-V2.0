@@ -20,12 +20,19 @@ class FilmController extends Controller
             new OA\Response(response: 200, description: 'Successful operation')
         ]
     )]
-    public function index()
+    public function index(Request $request)
     {
-        $films = Film::with(['genres', 'image'])->paginate(10);
+        $query = Film::with(['genres', 'image']);
 
-        return response()->json($films);
+        if ($request->has('coming_soon')) {
+            $query->where('coming_soon', $request->boolean('coming_soon'));
+        }
 
+        if ($request->boolean('all')) {
+            return response()->json($query->latest()->get());
+        }
+
+        return response()->json($query->latest()->paginate(24));
     }
 
     #[OA\Get(
@@ -194,16 +201,18 @@ class FilmController extends Controller
     public function search(Request $request)
     {
         $searched = $request->film;
-        $films = Film::where('title', 'like', '%' . $searched . '%')->get();
+        $query = Film::with(['genres', 'image'])->where('title', 'like', '%' . $searched . '%');
 
-        if ($films->isEmpty()) {
-            return response()->json([
-                'message' => 'film not found'
-            ], 404);
+        if ($request->has('coming_soon')) {
+            $query->where('coming_soon', $request->boolean('coming_soon'));
+        } else {
+            $query->where('coming_soon', false);
         }
 
+        $films = $query->get();
+
         return response()->json([
-            'message' => 'film is found',
+            'message' => $films->isEmpty() ? 'No films found' : 'film is found',
             'data' => $films
         ], 200);
     }
@@ -233,6 +242,12 @@ class FilmController extends Controller
     {
         $query = Film::with(['genres', 'image']);
 
+        if ($request->has('coming_soon')) {
+            $query->where('coming_soon', $request->boolean('coming_soon'));
+        } else {
+            $query->where('coming_soon', false);
+        }
+
         if ($request->has('genre_id')) {
             $query->whereHas('genres', function ($q) use ($request) {
                 $q->where('genres.id', $request->genre_id);
@@ -241,14 +256,8 @@ class FilmController extends Controller
 
         $films = $query->get();
 
-        if ($films->isEmpty()) {
-            return response()->json([
-                'message' => 'No films match this genre'
-            ], 404);
-        }
-
         return response()->json([
-            'message' => 'Filtered films found',
+            'message' => $films->isEmpty() ? 'No films match this genre' : 'Filtered films found',
             'data' => $films
         ], 200);
     }
