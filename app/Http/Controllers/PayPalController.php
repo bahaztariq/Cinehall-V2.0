@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\Payment;
 use App\Models\reservation;
-use App\Models\ticket;
 use App\Services\ReservationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -20,74 +19,60 @@ class PayPalController extends Controller
         $this->reservationService = $reservationService;
     }
 
-    #[OA\Post(
-        path: '/transactions/paypal',
-        summary: 'Create a PayPal transaction order',
-        tags: ['Payments'],
-        security: [['bearerAuth' => []]],
-        requestBody: new OA\RequestBody(
-            required: true,
-            content: new OA\JsonContent(
-                required: ['reservation_id', 'amount'],
-                properties: [
-                    new OA\Property(property: 'reservation_id', type: 'integer'),
-                    new OA\Property(property: 'amount', type: 'number')
-                ]
-            )
-        ),
-        responses: [
-            new OA\Response(response: 200, description: 'PayPal approval URL returned'),
-            new OA\Response(response: 403, description: 'Unauthorized/Forbidden'),
-            new OA\Response(response: 500, description: 'Internal server error')
-        ]
-    )]
+    /**
+     * Create a PayPal order for one or more reservations.
+     * Authoritative reservation set + amount are computed server-side and
+     * stored in the order's custom_id for tamper-proof capture.
+     */
+    #[OA\Post(path: '/transactions/paypal', summary: 'Create a PayPal order', tags: ['Payments'], security: [['bearerAuth' => []]])]
     public function createTransaction(Request $request)
     {
-        $request->validate([
-            'reservation_id' => 'required|exists:reservations,id'
+        $data = $request->validate([
+            'reservation_ids'   => 'required_without:reservation_id|array|min:1',
+            'reservation_ids.*' => 'integer',
+            'reservation_id'    => 'required_without:reservation_ids|integer',
         ]);
 
-        $reservation_id = $request->reservation_id;
+        $ids = $data['reservation_ids'] ?? [$data['reservation_id']];
 
-        // Security check: reservation must belong to the authenticated user
-        $reservation = reservation::with('session')->where('id', $reservation_id)
+        $reservations = reservation::with('session')
+            ->whereIn('id', $ids)
             ->where('user_id', Auth::id())
-            ->first();
+            ->get();
 
-        if (!$reservation) {
-            return response()->json(['error' => 'Unauthorized or invalid reservation.'], 403);
+        if ($reservations->isEmpty()) {
+            return response()->json(['error' => 'No valid reservations found.'], 404);
+        }
+        if ($reservations->contains(fn ($r) => $r->status === 'accepted')) {
+            return response()->json(['error' => 'One or more reservations are already paid.'], 400);
         }
 
-        $amount = $reservation->session->price;
-
-        if ($reservation->status === 'accepted') {
-            return response()->json(['error' => 'Reservation already paid.'], 400);
-        }
+        $amount = number_format($reservations->sum(fn ($r) => $r->session->price), 2, '.', '');
+        $idList = $reservations->pluck('id')->implode(',');
 
         $provider = new PayPalClient;
         $provider->setApiCredentials(config('paypal'));
         $provider->getAccessToken();
 
         $response = $provider->createOrder([
-            "intent"              => "CAPTURE",
-            "application_context" => [
-                "return_url" => route('successTransaction', ['reservation_id' => $reservation_id, 'amount' => $amount]),
-                "cancel_url" => route('cancelTransaction'),
+            'intent' => 'CAPTURE',
+            'application_context' => [
+                'return_url' => config('app.url') . '/booking/success?provider=paypal',
+                'cancel_url' => config('app.url') . '/booking/cancel',
             ],
-            "purchase_units" => [
-                0 => [
-                    "amount" => [
-                        "currency_code" => config('paypal.currency', 'USD'),
-                        "value"         => $amount,
-                    ],
+            'purchase_units' => [[
+                'custom_id' => $idList,
+                'amount' => [
+                    'currency_code' => config('paypal.currency', 'USD'),
+                    'value'         => $amount,
                 ],
-            ],
+            ]],
         ]);
 
         if (isset($response['id']) && $response['id'] != null) {
-            foreach ($response['links'] as $links) {
-                if ($links['rel'] == 'approve') {
-                    return response()->json(['approval_url' => $links['href']]);
+            foreach ($response['links'] as $link) {
+                if ($link['rel'] === 'approve') {
+                    return response()->json(['approval_url' => $link['href']]);
                 }
             }
         }
@@ -95,77 +80,55 @@ class PayPalController extends Controller
         return response()->json(['error' => $response['message'] ?? 'Unable to create PayPal order.'], 500);
     }
 
-    #[OA\Get(
-        path: '/transactions/paypal/success',
-        summary: 'Handle successful PayPal payment',
-        tags: ['Payments'],
-        parameters: [
-            new OA\Parameter(name: 'token', in: 'query', required: true, schema: new OA\Schema(type: 'string')),
-            new OA\Parameter(name: 'reservation_id', in: 'query', required: true, schema: new OA\Schema(type: 'integer')),
-            new OA\Parameter(name: 'amount', in: 'query', required: true, schema: new OA\Schema(type: 'number'))
-        ],
-        responses: [
-            new OA\Response(response: 200, description: 'Payment confirmed'),
-            new OA\Response(response: 500, description: 'Capture failed')
-        ]
-    )]
-    public function successTransaction(Request $request)
+    /**
+     * Capture an approved PayPal order and confirm the reservations.
+     * Called by the SPA (with JWT) after PayPal redirects back with a token.
+     */
+    #[OA\Post(path: '/transactions/paypal/capture', summary: 'Capture PayPal payment and issue tickets', tags: ['Payments'], security: [['bearerAuth' => []]])]
+    public function captureTransaction(Request $request)
     {
+        $request->validate(['token' => 'required|string']);
+
         $provider = new PayPalClient;
         $provider->setApiCredentials(config('paypal'));
         $provider->getAccessToken();
 
-        $response = $provider->capturePaymentOrder($request['token']);
+        $response = $provider->capturePaymentOrder($request->token);
 
-        if (isset($response['status']) && $response['status'] == 'COMPLETED') {
-            $reservation_id = $request->reservation_id;
-            $reservation    = reservation::with('session')->findOrFail($reservation_id);
-            $amount         = $reservation->session->price;
-            $transaction_id = $response['id'];
+        if (($response['status'] ?? null) !== 'COMPLETED') {
+            return response()->json(['error' => $response['message'] ?? 'Payment capture failed.'], 402);
+        }
 
-            // Create payment record (idempotent)
-            Payment::updateOrCreate(
-                ['transaction_id' => $transaction_id],
+        $transactionId = $response['id'];
+        $customId = $response['purchase_units'][0]['custom_id'] ?? '';
+        $ids = array_filter(explode(',', $customId));
+
+        $reservations = reservation::whereIn('id', $ids)
+            ->where('user_id', Auth::id())
+            ->get();
+
+        $tickets = [];
+        foreach ($reservations as $reservation) {
+            Payment::firstOrCreate(
+                ['transaction_id' => $transactionId . '-' . $reservation->id],
                 [
-                    'reservation_id' => $reservation_id,
-                    'amount'         => $amount,
+                    'reservation_id' => $reservation->id,
+                    'amount'         => $reservation->session->price ?? 0,
                     'status'         => 'completed',
                     'payment_method' => 'paypal',
                 ]
             );
-
-            // Update reservation status to accepted
-            $reservation = reservation::find($reservation_id);
-            if ($reservation) {
-                $this->reservationService->confirmPayment($reservation);
+            $ticket = $this->reservationService->confirmPayment($reservation);
+            if ($ticket) {
+                $tickets[] = $ticket->id;
             }
-
-            return response()->json([
-                'status'         => 'success',
-                'message'        => 'Payment successful.',
-                'transaction_id' => $transaction_id,
-            ]);
         }
 
         return response()->json([
-            'status'  => 'error',
-            'message' => $response['message'] ?? 'Payment capture failed.',
-        ], 500);
-    }
-
-    #[OA\Get(
-        path: '/transactions/paypal/cancel',
-        summary: 'Handle PayPal payment cancellation',
-        tags: ['Payments'],
-        responses: [
-            new OA\Response(response: 200, description: 'Payment canceled')
-        ]
-    )]
-    public function cancelTransaction(Request $request)
-    {
-        return response()->json([
-            'status'  => 'error',
-            'message' => 'You have canceled the transaction.',
+            'status'          => 'success',
+            'message'         => 'Payment confirmed. Your tickets are ready.',
+            'reservation_ids' => $reservations->pluck('id'),
+            'ticket_ids'      => $tickets,
         ]);
     }
 }
