@@ -98,6 +98,12 @@ class AuthController extends Controller
             return response()->json(['error' => 'Unauthorized'], 401);
         }
 
+        // Block banned accounts and discard the just-issued token.
+        if (auth()->user()->status === 'Banned') {
+            auth()->logout();
+            return response()->json(['error' => 'Your account has been suspended.'], 403);
+        }
+
         return $this->respondWithToken($token);
     }
 
