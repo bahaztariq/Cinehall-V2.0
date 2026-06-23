@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\StoregenreRequest;
 use App\Http\Requests\UpdategenreRequest;
 use App\Models\genre;
+use Illuminate\Support\Facades\Gate;
 use OpenApi\Attributes as OA;
 
 class GenreController extends Controller
