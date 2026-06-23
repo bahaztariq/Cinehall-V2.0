@@ -4,10 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Models\Payment;
 use App\Models\reservation;
-use App\Models\ticket;
 use App\Services\ReservationService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Laravel\Cashier\Cashier;
 use OpenApi\Attributes as OA;
 
 class StripeController extends Controller
@@ -19,116 +19,107 @@ class StripeController extends Controller
         $this->reservationService = $reservationService;
     }
 
-    #[OA\Post(
-        path: '/transactions/stripe',
-        summary: 'Create a Stripe Checkout Session',
-        tags: ['Payments'],
-        security: [['bearerAuth' => []]],
-        requestBody: new OA\RequestBody(
-            required: true,
-            content: new OA\JsonContent(
-                required: ['reservation_id', 'amount'],
-                properties: [
-                    new OA\Property(property: 'reservation_id', type: 'integer'),
-                    new OA\Property(property: 'amount', type: 'number')
-                ]
-            )
-        ),
-        responses: [
-            new OA\Response(response: 200, description: 'Stripe session created'),
-            new OA\Response(response: 400, description: 'Invalid request or already paid'),
-            new OA\Response(response: 401, description: 'Unauthenticated')
-        ]
-    )]
+    /**
+     * Create a Stripe Checkout Session for one or more reservations.
+     * Returns a hosted checkout URL the SPA redirects to. The authoritative
+     * reservation set + amount are computed server-side and stored in the
+     * session metadata so the later verify step cannot be tampered with.
+     */
+    #[OA\Post(path: '/transactions/stripe', summary: 'Create a Stripe Checkout Session', tags: ['Payments'], security: [['bearerAuth' => []]])]
     public function createSession(Request $request)
     {
-        $request->validate([
-            'reservation_id' => 'required|exists:reservations,id'
+        $data = $request->validate([
+            'reservation_ids'   => 'required_without:reservation_id|array|min:1',
+            'reservation_ids.*' => 'integer',
+            'reservation_id'    => 'required_without:reservation_ids|integer',
         ]);
 
+        $ids = $data['reservation_ids'] ?? [$data['reservation_id']];
         $user = Auth::user();
-        $reservation = reservation::with('session')->where('id', $request->reservation_id)
-            ->where('user_id', $user->id)
-            ->firstOrFail();
 
-        if ($reservation->status === 'accepted') {
-            return response()->json(['error' => 'Reservation already paid.'], 400);
+        $reservations = reservation::with('session')
+            ->whereIn('id', $ids)
+            ->where('user_id', $user->id)
+            ->get();
+
+        if ($reservations->isEmpty()) {
+            return response()->json(['error' => 'No valid reservations found.'], 404);
+        }
+        if ($reservations->contains(fn ($r) => $r->status === 'accepted')) {
+            return response()->json(['error' => 'One or more reservations are already paid.'], 400);
         }
 
-        $amount = $reservation->session->price;
+        $unitAmount = (int) round($reservations->first()->session->price * 100);
+        $count = $reservations->count();
 
-        return $user->checkout([$amount * 100 => 'Reservation Payment'], [
-            'success_url' => route('stripe.success', ['reservation_id' => $reservation->id]) . '&session_id={CHECKOUT_SESSION_ID}',
-            'cancel_url'  => route('stripe.cancel'),
+        $session = Cashier::stripe()->checkout->sessions->create([
+            'mode' => 'payment',
+            'line_items' => [[
+                'price_data' => [
+                    'currency'     => strtolower(config('cashier.currency', 'usd')),
+                    'product_data' => ['name' => "Cinehall — {$count} seat(s)"],
+                    'unit_amount'  => $unitAmount,
+                ],
+                'quantity' => $count,
+            ]],
+            'success_url' => config('app.url') . '/booking/success?provider=stripe&cs={CHECKOUT_SESSION_ID}',
+            'cancel_url'  => config('app.url') . '/booking/cancel',
             'metadata'    => [
-                'reservation_id' => $reservation->id,
-                'user_id'        => $user->id,
+                'user_id'         => $user->id,
+                'reservation_ids' => $reservations->pluck('id')->implode(','),
             ],
         ]);
+
+        return response()->json(['url' => $session->url]);
     }
 
-    #[OA\Get(
-        path: '/transactions/stripe/success',
-        summary: 'Handle successful Stripe payment',
-        tags: ['Payments'],
-        parameters: [
-            new OA\Parameter(name: 'reservation_id', in: 'query', required: true, schema: new OA\Schema(type: 'integer')),
-            new OA\Parameter(name: 'session_id', in: 'query', required: true, schema: new OA\Schema(type: 'string'))
-        ],
-        responses: [
-            new OA\Response(response: 200, description: 'Payment confirmed'),
-            new OA\Response(response: 400, description: 'Invalid request')
-        ]
-    )]
-    public function handleSuccess(Request $request)
+    /**
+     * Verify a completed Stripe Checkout Session and confirm the reservations.
+     * Called by the SPA (with JWT) after Stripe redirects back. Confirms only
+     * if Stripe reports the session as paid and the metadata user matches.
+     */
+    #[OA\Post(path: '/transactions/stripe/verify', summary: 'Verify Stripe payment and issue tickets', tags: ['Payments'], security: [['bearerAuth' => []]])]
+    public function verify(Request $request)
     {
-        $reservation_id = $request->get('reservation_id');
-        $session_id     = $request->get('session_id');
+        $request->validate(['cs' => 'required|string']);
+        $user = Auth::user();
 
-        if (!$reservation_id || !$session_id) {
-            return response()->json(['error' => 'Invalid request.'], 400);
+        $cs = Cashier::stripe()->checkout->sessions->retrieve($request->cs);
+
+        if (!$cs || ($cs->metadata['user_id'] ?? null) != $user->id) {
+            return response()->json(['error' => 'Payment session not found.'], 404);
+        }
+        if ($cs->payment_status !== 'paid') {
+            return response()->json(['error' => 'Payment not completed.', 'status' => $cs->payment_status], 402);
         }
 
-        $reservation = reservation::with('session')->findOrFail($reservation_id);
+        $ids = array_filter(explode(',', $cs->metadata['reservation_ids'] ?? ''));
+        $reservations = reservation::whereIn('id', $ids)
+            ->where('user_id', $user->id)
+            ->get();
 
-        // Prevent duplicate processing if user refreshes the success page
-        $existingPayment = Payment::where('transaction_id', $session_id)->first();
-
-        if (!$existingPayment) {
-            // Fetch the real price from the film session
-            $amount = $reservation->session->price ?? 0;
-
-            Payment::create([
-                'reservation_id' => $reservation->id,
-                'amount'         => $amount,
-                'status'         => 'completed',
-                'payment_method' => 'stripe',
-                'transaction_id' => $session_id,
-            ]);
-
-            $this->reservationService->confirmPayment($reservation);
+        $tickets = [];
+        foreach ($reservations as $reservation) {
+            Payment::firstOrCreate(
+                ['transaction_id' => $cs->id . '-' . $reservation->id],
+                [
+                    'reservation_id' => $reservation->id,
+                    'amount'         => $reservation->session->price ?? 0,
+                    'status'         => 'completed',
+                    'payment_method' => 'stripe',
+                ]
+            );
+            $ticket = $this->reservationService->confirmPayment($reservation);
+            if ($ticket) {
+                $tickets[] = $ticket->id;
+            }
         }
 
         return response()->json([
-            'status'         => 'success',
-            'message'        => 'Payment successful via Stripe.',
-            'reservation_id' => $reservation_id,
-        ]);
-    }
-
-    #[OA\Get(
-        path: '/transactions/stripe/cancel',
-        summary: 'Handle Stripe payment cancellation',
-        tags: ['Payments'],
-        responses: [
-            new OA\Response(response: 200, description: 'Payment canceled')
-        ]
-    )]
-    public function handleCancel()
-    {
-        return response()->json([
-            'status'  => 'error',
-            'message' => 'Payment was canceled.',
+            'status'           => 'success',
+            'message'          => 'Payment confirmed. Your tickets are ready.',
+            'reservation_ids'  => $reservations->pluck('id'),
+            'ticket_ids'       => $tickets,
         ]);
     }
 }
