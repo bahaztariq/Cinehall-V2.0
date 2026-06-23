@@ -25,7 +25,7 @@ class ReservationController extends Controller
     )]
     public function index()
     {
-        $reservations = reservation::with(['session.film.image', 'session.room', 'seat'])
+        $reservations = reservation::with(['session.film.image', 'session.room', 'seat', 'tickets'])
             ->where('user_id', auth()->id())
             ->latest()
             ->get();
@@ -85,21 +85,33 @@ class ReservationController extends Controller
             return response()->json(['message' => 'This seat does not exist in this room'], 422);
         }
 
-        $isTaken = $seat->reservations()
-            ->where('session_id', $session->id)
-            ->whereIn('status', ['pending', 'accepted'])
-            ->exists();
+        // Atomically claim the seat: lock active rows for this seat+session,
+        // re-check inside the transaction, then insert. A partial unique index
+        // (reservations_active_seat_unique) is the final backstop against races.
+        try {
+            $reservation = DB::transaction(function () use ($request, $session, $seatId) {
+                $taken = reservation::where('session_id', $session->id)
+                    ->where('seat_id', $seatId)
+                    ->whereIn('status', ['pending', 'accepted'])
+                    ->lockForUpdate()
+                    ->exists();
 
-        if ($isTaken) {
+                if ($taken) {
+                    throw new \RuntimeException('SEAT_TAKEN');
+                }
+
+                return $request->user()->reservations()->create([
+                    'session_id'  => $session->id,
+                    'seat_id'     => $seatId,
+                    'reserved_at' => now()->addMinutes(15),
+                    'status'      => 'pending',
+                ]);
+            });
+        } catch (\RuntimeException $e) {
+            return response()->json(['message' => 'Seat is already reserved'], 422);
+        } catch (\Illuminate\Database\UniqueConstraintViolationException $e) {
             return response()->json(['message' => 'Seat is already reserved'], 422);
         }
-
-        $reservation = $request->user()->reservations()->create([
-            'session_id'  => $session->id,
-            'seat_id'     => $seatId,
-            'reserved_at' => now()->addMinutes(15),
-            'status'      => 'pending',
-        ]);
 
         return response()->json([
             'message' => 'Reservation created. Please pay within 15 minutes to confirm your seat.',
