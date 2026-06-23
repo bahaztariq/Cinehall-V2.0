@@ -41,7 +41,7 @@ class SessionController extends Controller
     )]
     public function show(session $filmSession)
     {
-        return response()->json(['film_session' => $filmSession->load(['film', 'room'])]);
+        return response()->json(['film_session' => $filmSession->load(['film', 'room', 'reservations'])]);
     }
 
     #[OA\Post(
