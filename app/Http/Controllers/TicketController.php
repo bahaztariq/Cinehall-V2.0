@@ -43,7 +43,7 @@ class TicketController extends Controller
         $qrData = implode('|', [
             'TicketID:'      . $ticket->id,
             'ReservationID:' . $ticket->reservation_id,
-            'Seat:'          . ($ticket->seat->number ?? $ticket->seat_id),
+            'Seat:'          . ($ticket->seat->seat_number ?? $ticket->seat_id),
             'Film:'          . ($ticket->reservation->session->film->title ?? 'N/A'),
         ]);
 
