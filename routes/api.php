@@ -14,6 +14,8 @@ use App\Http\Controllers\RoomController;
 use App\Http\Controllers\StripeController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\GenreController;
+use App\Http\Controllers\PromotionController;
+use App\Http\Controllers\SettingController;
 
 Route::prefix('v1')->group(function () {
 
@@ -55,6 +57,18 @@ Route::prefix('v1')->group(function () {
         Route::get('/statistics', [AdminController::class, 'statistics']);
         Route::patch('/users/{user}/toggle-status', [AdminController::class, 'toggleUserStatus']);
 
+        // Admin: bookings management & revenue
+        Route::get('/admin/reservations', [AdminController::class, 'reservations']);
+        Route::patch('/admin/reservations/{reservation}/cancel', [AdminController::class, 'cancelReservation']);
+        Route::get('/admin/payments', [AdminController::class, 'payments']);
+
+        // Admin: site settings
+        Route::get('/admin/settings', [SettingController::class, 'index']);
+        Route::put('/admin/settings', [SettingController::class, 'update']);
+
+        // Promotions (write gated by request/controller admin checks)
+        Route::apiResource('promotions', PromotionController::class);
+
         // Sessions management (Admin-only logic is handled in Controller/Requests)
         Route::post('/sessions', [SessionController::class, 'store']);
         Route::put('/sessions/{film_session}', [SessionController::class, 'update']);
@@ -75,6 +89,10 @@ Route::prefix('v1')->group(function () {
         Route::match(['put', 'patch'], '/films/{film}', [FilmController::class, 'update']);
         Route::delete('/films/{film}', [FilmController::class, 'destroy']);
 
+        // TMDB Import routes
+        Route::get('/tmdb/search', [\App\Http\Controllers\TMDBController::class, 'search']);
+        Route::post('/tmdb/import', [\App\Http\Controllers\TMDBController::class, 'import']);
+
         // Reservations
         Route::apiResource('reservation', ReservationController::class)->names([
             'index'   => 'reservations.index',
@@ -93,17 +111,14 @@ Route::prefix('v1')->group(function () {
         // Tickets
         Route::get('/tickets/{ticketId}/download', [TicketController::class, 'donwloadReceipt']);
 
-        // Transactions (PayPal & Stripe)
+        // Transactions (PayPal & Stripe) — SPA flow:
+        // create returns a hosted URL; the provider redirects back to the SPA,
+        // which then calls verify/capture (with JWT) to confirm the real payment.
         Route::prefix('transactions')->group(function () {
-            // PayPal
-            Route::post('/paypal', [PayPalController::class, 'createTransaction']);
-            Route::get('/paypal/success', [PayPalController::class, 'successTransaction'])->name('successTransaction');
-            Route::get('/paypal/cancel', [PayPalController::class, 'cancelTransaction'])->name('cancelTransaction');
-
-            // Stripe
             Route::post('/stripe', [StripeController::class, 'createSession']);
-            Route::get('/stripe/success', [StripeController::class, 'handleSuccess'])->name('stripe.success');
-            Route::get('/stripe/cancel', [StripeController::class, 'handleCancel'])->name('stripe.cancel');
+            Route::post('/stripe/verify', [StripeController::class, 'verify']);
+            Route::post('/paypal', [PayPalController::class, 'createTransaction']);
+            Route::post('/paypal/capture', [PayPalController::class, 'captureTransaction']);
         });
     });
 });
