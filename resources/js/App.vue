@@ -1,19 +1,15 @@
 <template>
-    <div class="min-h-screen bg-[#0c0c0c] text-white font-sans selection:bg-yellow-500/30">
+    <!-- Admin routes render their own full-screen layout (sidebar) -->
+    <router-view v-if="isAdmin" />
+
+    <!-- Public site shell -->
+    <div v-else class="min-h-screen bg-surface text-on-surface font-sans selection:bg-primary selection:text-on-primary">
         <Navbar />
-        
-        <!-- Main Content -->
-        <main class="max-w-7xl mx-auto py-12 px-5">
+
+        <!-- Main Content offset for fixed Navbar; home renders a full-screen hero behind the nav -->
+        <main :class="[isHome ? '' : 'pt-16 md:pt-[4.5rem]', 'min-h-[calc(100vh-4.5rem)]']">
             <router-view v-slot="{ Component }">
-                <transition 
-                    enter-active-class="transform transition duration-500 ease-out"
-                    enter-from-class="opacity-0 translate-y-4"
-                    enter-to-class="opacity-100 translate-y-0"
-                    leave-active-class="transform transition duration-300 ease-in"
-                    leave-from-class="opacity-100 translate-y-0"
-                    leave-to-class="opacity-0 -translate-y-4"
-                    mode="out-in"
-                >
+                <transition name="fade" mode="out-in">
                     <component :is="Component" />
                 </transition>
             </router-view>
@@ -24,6 +20,12 @@
 </template>
 
 <script setup>
+import { computed } from 'vue';
+import { useRoute } from 'vue-router';
 import Navbar from './components/Navbar.vue';
 import Footer from './components/Footer.vue';
+
+const route = useRoute();
+const isAdmin = computed(() => route.matched.some(r => r.meta?.admin));
+const isHome = computed(() => route.path === '/');
 </script>
