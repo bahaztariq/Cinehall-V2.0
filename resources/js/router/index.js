@@ -7,13 +7,20 @@ import Reservation from '../views/Reservation.vue';
 import Profile from '../views/Profile.vue';
 import NotFound from '../views/NotFound.vue';
 import Favourites from '../views/Favourites.vue';
+import BookingResult from '../views/BookingResult.vue';
 
 // Admin Views
+import AdminLayout from '../views/Admin/AdminLayout.vue';
 import AdminDashboard from '../views/Admin/Dashboard.vue';
 import AdminUsers from '../views/Admin/Users.vue';
 import AdminFilms from '../views/Admin/Films.vue';
 import AdminSessions from '../views/Admin/Sessions.vue';
 import AdminRooms from '../views/Admin/Rooms.vue';
+import AdminGenres from '../views/Admin/Genres.vue';
+import AdminBookings from '../views/Admin/Bookings.vue';
+import AdminPayments from '../views/Admin/Payments.vue';
+import AdminPromotions from '../views/Admin/Promotions.vue';
+import AdminSettings from '../views/Admin/Settings.vue';
 
 import { useAuthStore } from '../store/auth';
 
@@ -58,17 +65,35 @@ const routes = [
         component: Favourites,
         meta: { requiresAuth: true }
     },
-    // Admin Routes
+    {
+        path: '/booking/success',
+        name: 'booking-success',
+        component: BookingResult,
+        meta: { requiresAuth: true }
+    },
+    {
+        path: '/booking/cancel',
+        name: 'booking-cancel',
+        component: BookingResult,
+        meta: { requiresAuth: true }
+    },
+    // Admin Routes (nested in AdminLayout with its own sidebar)
     {
         path: '/admin',
+        component: AdminLayout,
+        meta: { requiresAdmin: true, admin: true },
         children: [
             { path: '', name: 'admin-dashboard', component: AdminDashboard },
             { path: 'users', name: 'admin-users', component: AdminUsers },
             { path: 'films', name: 'admin-films', component: AdminFilms },
             { path: 'sessions', name: 'admin-sessions', component: AdminSessions },
             { path: 'rooms', name: 'admin-rooms', component: AdminRooms },
-        ],
-        meta: { requiresAdmin: true }
+            { path: 'genres', name: 'admin-genres', component: AdminGenres },
+            { path: 'bookings', name: 'admin-bookings', component: AdminBookings },
+            { path: 'payments', name: 'admin-payments', component: AdminPayments },
+            { path: 'promotions', name: 'admin-promotions', component: AdminPromotions },
+            { path: 'settings', name: 'admin-settings', component: AdminSettings },
+        ]
     },
     {
         path: '/:pathMatch(.*)*',
