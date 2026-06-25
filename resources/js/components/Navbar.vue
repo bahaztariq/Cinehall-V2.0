@@ -1,118 +1,269 @@
 <template>
-    <nav class="sticky top-0 z-50 bg-black/60 backdrop-blur-xl border-b border-white/10">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex items-center justify-between h-20 gap-4">
-                <!-- Logo -->
-                <router-link to="/" class="flex items-center gap-2 shrink-0">
-                    <span class="text-2xl font-black tracking-tighter text-white uppercase italic">
-                        Cine<span class="text-yellow-600">hall</span>
-                    </span>
-                </router-link>
+    <nav
+        class="fixed top-0 w-full z-50 transition-colors duration-300"
+        :class="scrolled || mobileMenu ? 'bg-surface/80 backdrop-blur-xl border-b border-outline-variant/60' : 'bg-transparent border-b border-transparent'"
+    >
+        <div class="max-w-7xl mx-auto px-4 sm:px-8 h-16 md:h-[4.5rem] flex items-center justify-between gap-3 md:gap-6">
+            <!-- Brand: icon mark + single wordmark -->
+            <router-link to="/" class="flex items-center gap-2 shrink-0 select-none group" aria-label="Cinehall home">
+                <img src="/assets/logo_icon.png" class="h-8 w-8 md:h-9 md:w-9 object-contain" alt="" />
+                <span class="font-serif text-xl md:text-2xl font-bold tracking-tight text-on-surface group-hover:text-primary transition-colors">
+                    Cine<span class="text-primary">hall</span>
+                </span>
+            </router-link>
 
-                <!-- Search Bar -->
-                <div class="flex-1 max-w-md relative hidden md:block">
+            <!-- Desktop Search -->
+            <div class="flex-1 max-w-md relative hidden md:block">
+                <div class="relative flex items-center bg-surface-container-low px-4 py-2.5 rounded-full border border-outline-variant focus-within:border-primary/60 transition-colors">
+                    <span class="material-symbols-outlined text-on-surface-variant text-[18px] mr-2" aria-hidden="true">search</span>
                     <input
                         v-model="searchQuery"
                         @keyup.enter="doSearch"
                         @input="onInput"
                         type="text"
-                        placeholder="Search films..."
-                        class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 pr-10 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-yellow-600/60 transition-all"
+                        aria-label="Search films"
+                        placeholder="Search films, genres..."
+                        class="bg-transparent border-none outline-none focus:ring-0 text-sm text-on-surface w-full placeholder:text-on-surface-variant/60"
                     />
-                    <button @click="doSearch" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-yellow-600 transition-colors">
-                        <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/></svg>
+                    <button v-if="searchQuery" @click="clearSearch" aria-label="Clear search" class="text-on-surface-variant hover:text-primary transition-colors cursor-pointer ml-2">
+                        <span class="material-symbols-outlined text-[16px]" aria-hidden="true">close</span>
                     </button>
-                    <!-- Suggestions -->
-                    <div v-if="suggestions.length" class="absolute top-full left-0 right-0 mt-2 bg-[#111] border border-white/10 rounded-xl overflow-hidden shadow-2xl z-50">
-                        <router-link
-                            v-for="film in suggestions"
-                            :key="film.id"
-                            :to="`/Film/${film.id}`"
-                            @click="suggestions = []; searchQuery = ''"
-                            class="flex items-center gap-3 px-4 py-3 hover:bg-white/5 transition-colors"
-                        >
-                            <img :src="film.image?.path || 'https://via.placeholder.com/40x60'" class="w-8 h-12 object-cover rounded" />
-                            <div>
-                                <p class="text-sm font-bold text-white">{{ film.title }}</p>
-                                <p class="text-xs text-gray-500">{{ film.duration }} min</p>
-                            </div>
-                        </router-link>
-                    </div>
                 </div>
-
-                <!-- Auth Actions -->
-                <div class="flex items-center gap-3 shrink-0">
-                    <template v-if="auth.isAuthenticated">
-                        <router-link v-if="auth.isAdmin" to="/admin" class="text-yellow-600 hover:text-yellow-500 transition-colors font-black uppercase tracking-widest text-xs border border-yellow-600/30 px-3 py-1.5 rounded-lg bg-yellow-600/10 hidden sm:block">
-                            Admin
-                        </router-link>
-                        <router-link to="/favourites" class="text-gray-300 hover:text-red-400 transition-colors" title="My Favourites">
-                            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" /></svg>
-                        </router-link>
-                        <router-link to="/profile" class="text-gray-300 hover:text-white transition-colors font-medium text-sm">
-                            Profile
-                        </router-link>
-                        <button @click="handleLogout" class="bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-lg transition-all border border-white/10 text-sm">
-                            Logout
-                        </button>
-                    </template>
-                    <template v-else>
-                        <router-link to="/login" class="text-gray-300 hover:text-white transition-colors font-medium text-sm">
-                            Login
-                        </router-link>
-                        <router-link to="/register" class="bg-yellow-600 hover:bg-yellow-700 text-white px-4 py-2 rounded-lg transition-all shadow-lg shadow-yellow-600/20 font-bold text-sm">
-                            Register
-                        </router-link>
-                    </template>
+                <div v-if="suggestions.length" class="absolute top-full left-0 right-0 mt-2 bg-surface-container rounded-xl border border-outline-variant overflow-hidden shadow-[0_12px_40px_rgba(0,0,0,0.6)] z-50">
+                    <router-link
+                        v-for="film in suggestions"
+                        :key="film.id"
+                        :to="`/Film/${film.id}`"
+                        @click="onPick"
+                        class="flex items-center gap-3 px-4 py-3 border-b border-outline-variant/60 last:border-0 hover:bg-surface-container-high transition-colors"
+                    >
+                        <img :src="getImageUrl(film.image)" :alt="film.title" class="w-8 aspect-2/3 object-cover rounded border border-outline-variant" />
+                        <div class="min-w-0">
+                            <p class="text-xs font-bold text-on-surface truncate">{{ film.title }}</p>
+                            <p class="text-[0.6rem] text-primary font-bold tracking-widest uppercase mt-0.5">{{ film.duration }} MIN</p>
+                        </div>
+                    </router-link>
                 </div>
             </div>
+
+            <!-- Desktop Nav / Actions -->
+            <div class="hidden md:flex items-center gap-1 shrink-0">
+                <template v-if="auth.isAuthenticated">
+                    <router-link to="/favourites" aria-label="Favourites" class="p-2 rounded-lg transition-colors" :class="isActive('/favourites') ? 'text-primary' : 'text-on-surface-variant hover:text-primary'">
+                        <span class="material-symbols-outlined text-[22px]" aria-hidden="true">favorite</span>
+                    </router-link>
+                    <router-link v-if="auth.isAdmin" to="/admin" class="ml-1 border border-primary/40 text-primary px-3.5 py-1.5 rounded-full font-bold uppercase tracking-widest text-[0.6rem] bg-primary/5 hover:bg-primary/15 transition-colors">
+                        Admin
+                    </router-link>
+                    <div class="relative ml-1" ref="menuRef">
+                        <button @click="menuOpen = !menuOpen" aria-label="Account menu" :aria-expanded="menuOpen" class="flex items-center gap-2 pl-1 pr-2 py-1 rounded-full hover:bg-surface-container transition-colors cursor-pointer">
+                            <span class="w-8 h-8 rounded-full gold-gradient flex items-center justify-center text-xs font-black uppercase">{{ initial }}</span>
+                            <span class="material-symbols-outlined text-[18px] text-on-surface-variant" aria-hidden="true">{{ menuOpen ? 'expand_less' : 'expand_more' }}</span>
+                        </button>
+                        <transition name="menu">
+                            <div v-if="menuOpen" class="absolute right-0 mt-2 w-56 bg-surface-container border border-outline-variant rounded-xl shadow-[0_12px_40px_rgba(0,0,0,0.6)] overflow-hidden z-50">
+                                <div class="px-4 py-3 border-b border-outline-variant">
+                                    <p class="text-sm font-bold text-on-surface truncate">{{ auth.user?.name }}</p>
+                                    <p class="text-xs text-on-surface-variant truncate">{{ auth.user?.email }}</p>
+                                </div>
+                                <router-link to="/profile" @click="menuOpen = false" class="flex items-center gap-3 px-4 py-3 text-sm text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors">
+                                    <span class="material-symbols-outlined text-[18px]" aria-hidden="true">confirmation_number</span> My Tickets
+                                </router-link>
+                                <router-link v-if="auth.isAdmin" to="/admin" @click="menuOpen = false" class="flex items-center gap-3 px-4 py-3 text-sm text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors">
+                                    <span class="material-symbols-outlined text-[18px]" aria-hidden="true">dashboard</span> Admin Panel
+                                </router-link>
+                                <button @click="handleLogout" class="w-full flex items-center gap-3 px-4 py-3 text-sm text-red-400 hover:bg-red-500/10 transition-colors cursor-pointer border-t border-outline-variant">
+                                    <span class="material-symbols-outlined text-[18px]" aria-hidden="true">logout</span> Logout
+                                </button>
+                            </div>
+                        </transition>
+                    </div>
+                </template>
+                <template v-else>
+                    <router-link to="/login" class="ml-1 px-4 py-2 rounded-full text-on-surface-variant hover:text-on-surface font-bold uppercase tracking-widest text-[0.65rem] transition-colors">
+                        Sign In
+                    </router-link>
+                    <router-link to="/register" class="gold-gradient px-5 py-2 rounded-full font-bold uppercase tracking-widest text-[0.65rem] hover:brightness-110 active:scale-95 transition-all">
+                        Join
+                    </router-link>
+                </template>
+            </div>
+
+            <!-- Mobile controls -->
+            <div class="flex md:hidden items-center gap-0.5">
+                <button @click="openMobileSearch" aria-label="Search" class="p-2 text-on-surface-variant hover:text-primary transition-colors">
+                    <span class="material-symbols-outlined text-[24px]" aria-hidden="true">search</span>
+                </button>
+                <router-link v-if="auth.isAuthenticated" to="/favourites" aria-label="Favourites" class="p-2 text-on-surface-variant hover:text-primary transition-colors">
+                    <span class="material-symbols-outlined text-[22px]" aria-hidden="true">favorite</span>
+                </router-link>
+                <button @click="mobileMenu = !mobileMenu" :aria-label="mobileMenu ? 'Close menu' : 'Open menu'" :aria-expanded="mobileMenu" class="p-2 text-on-surface hover:text-primary transition-colors">
+                    <span class="material-symbols-outlined text-[26px]" aria-hidden="true">{{ mobileMenu ? 'close' : 'menu' }}</span>
+                </button>
+            </div>
         </div>
+
+        <!-- Mobile menu drawer -->
+        <transition name="slide">
+            <div v-if="mobileMenu" class="md:hidden border-t border-outline-variant bg-surface-container/95 backdrop-blur-xl px-4 py-4 space-y-1">
+                <template v-if="auth.isAuthenticated">
+                    <router-link to="/favourites" @click="mobileMenu = false" class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold uppercase tracking-widest text-on-surface-variant hover:bg-surface-container-high transition-colors">
+                        <span class="material-symbols-outlined text-[20px]" aria-hidden="true">favorite</span> Favourites
+                    </router-link>
+                    <router-link to="/profile" @click="mobileMenu = false" class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold uppercase tracking-widest text-on-surface-variant hover:bg-surface-container-high transition-colors">
+                        <span class="material-symbols-outlined text-[20px]" aria-hidden="true">confirmation_number</span> My Tickets
+                    </router-link>
+                    <router-link v-if="auth.isAdmin" to="/admin" @click="mobileMenu = false" class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold uppercase tracking-widest text-primary bg-primary/5">
+                        <span class="material-symbols-outlined text-[20px]" aria-hidden="true">dashboard</span> Admin Panel
+                    </router-link>
+                    <button @click="handleLogout" class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold uppercase tracking-widest text-red-400 hover:bg-red-500/10 transition-colors cursor-pointer">
+                        <span class="material-symbols-outlined text-[20px]" aria-hidden="true">logout</span> Logout
+                    </button>
+                </template>
+                <template v-else>
+                    <div class="flex gap-3 pt-2">
+                        <router-link to="/login" @click="mobileMenu = false" class="flex-1 text-center px-4 py-3 rounded-full border border-outline-variant text-on-surface font-bold uppercase tracking-widest text-xs">Sign In</router-link>
+                        <router-link to="/register" @click="mobileMenu = false" class="flex-1 text-center gold-gradient px-4 py-3 rounded-full font-bold uppercase tracking-widest text-xs">Join</router-link>
+                    </div>
+                </template>
+            </div>
+        </transition>
+
+        <!-- Mobile full search overlay -->
+        <transition name="fade">
+            <div v-if="mobileSearch" class="md:hidden fixed inset-0 z-[60] bg-surface/98 backdrop-blur-xl flex flex-col">
+                <div class="flex items-center gap-2 px-4 h-16 border-b border-outline-variant">
+                    <div class="relative flex items-center flex-1 bg-surface-container-low px-4 py-3 rounded-xl border border-outline-variant focus-within:border-primary/60">
+                        <span class="material-symbols-outlined text-on-surface-variant text-[20px] mr-2" aria-hidden="true">search</span>
+                        <input
+                            ref="mobileInput"
+                            v-model="searchQuery"
+                            @keyup.enter="doSearch"
+                            @input="onInput"
+                            type="text"
+                            aria-label="Search films"
+                            placeholder="Search films, genres..."
+                            class="bg-transparent outline-none text-base text-on-surface w-full placeholder:text-on-surface-variant/60"
+                        />
+                        <button v-if="searchQuery" @click="clearSearch" aria-label="Clear search" class="text-on-surface-variant ml-2">
+                            <span class="material-symbols-outlined text-[18px]" aria-hidden="true">close</span>
+                        </button>
+                    </div>
+                    <button @click="mobileSearch = false" aria-label="Close search" class="px-2 py-2 text-sm font-bold uppercase tracking-widest text-on-surface-variant hover:text-primary">Cancel</button>
+                </div>
+                <div class="flex-1 overflow-y-auto px-4 py-2">
+                    <router-link
+                        v-for="film in suggestions"
+                        :key="film.id"
+                        :to="`/Film/${film.id}`"
+                        @click="onPick"
+                        class="flex items-center gap-3 px-2 py-3 border-b border-outline-variant/60 hover:bg-surface-container-high rounded-lg"
+                    >
+                        <img :src="getImageUrl(film.image)" :alt="film.title" class="w-10 aspect-2/3 object-cover rounded border border-outline-variant" />
+                        <div class="min-w-0">
+                            <p class="text-sm font-bold text-on-surface truncate">{{ film.title }}</p>
+                            <p class="text-[0.6rem] text-primary font-bold tracking-widest uppercase mt-0.5">{{ film.duration }} MIN</p>
+                        </div>
+                    </router-link>
+                    <p v-if="searchQuery && !suggestions.length" class="text-center text-sm text-on-surface-variant py-10">No films match "{{ searchQuery }}".</p>
+                </div>
+            </div>
+        </transition>
     </nav>
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, computed, watch, nextTick, onMounted, onUnmounted } from 'vue';
 import { useAuthStore } from '../store/auth';
-import { useRouter } from 'vue-router';
+import { useRouter, useRoute } from 'vue-router';
 import axios from 'axios';
 
 const auth = useAuthStore();
 const router = useRouter();
+const route = useRoute();
 
 const searchQuery = ref('');
 const suggestions = ref([]);
+const menuOpen = ref(false);
+const mobileMenu = ref(false);
+const mobileSearch = ref(false);
+const menuRef = ref(null);
+const mobileInput = ref(null);
+const scrolled = ref(false);
 let debounceTimer = null;
+
+const initial = computed(() => (auth.user?.name?.charAt(0) || 'U').toUpperCase());
+const isActive = (path) => (path === '/' ? route.path === '/' : route.path.startsWith(path));
+
+const getImageUrl = (image) => {
+    if (!image || !image.path) return 'https://via.placeholder.com/300x450?text=No+Image';
+    if (image.path.startsWith('http')) return image.path;
+    return `/storage/${image.path}`;
+};
+
+const clearSearch = () => { searchQuery.value = ''; suggestions.value = []; };
+
+const openMobileSearch = () => {
+    mobileMenu.value = false;
+    mobileSearch.value = true;
+    nextTick(() => mobileInput.value?.focus());
+};
 
 const doSearch = () => {
     if (!searchQuery.value.trim()) return;
     suggestions.value = [];
+    mobileSearch.value = false;
     router.push({ path: '/', query: { search: searchQuery.value.trim() } });
     searchQuery.value = '';
 };
 
+const onPick = () => { suggestions.value = []; searchQuery.value = ''; mobileSearch.value = false; };
+
 const onInput = () => {
     clearTimeout(debounceTimer);
-    if (!searchQuery.value.trim()) {
-        suggestions.value = [];
-        return;
-    }
+    if (!searchQuery.value.trim()) { suggestions.value = []; return; }
     debounceTimer = setTimeout(async () => {
         try {
             const res = await axios.get(`/api/v1/films/search?film=${encodeURIComponent(searchQuery.value)}`);
-            suggestions.value = (res.data.data || []).slice(0, 5);
-        } catch {
-            suggestions.value = [];
-        }
+            suggestions.value = (res.data.data || []).slice(0, 6);
+        } catch { suggestions.value = []; }
     }, 300);
 };
 
 const handleLogout = async () => {
     try {
-        await axios.post('/api/v1/logout', {}, {
-            headers: { Authorization: `Bearer ${auth.token}` }
-        });
+        await axios.post('/api/v1/logout', {}, { headers: { Authorization: `Bearer ${auth.token}` } });
     } catch { /* ignore */ }
     auth.logout();
+    menuOpen.value = false;
+    mobileMenu.value = false;
     router.push('/login');
 };
+
+watch(() => route.path, () => { menuOpen.value = false; mobileMenu.value = false; mobileSearch.value = false; });
+
+const onClickOutside = (e) => {
+    if (menuRef.value && !menuRef.value.contains(e.target)) menuOpen.value = false;
+};
+const onScroll = () => {
+    scrolled.value = (window.scrollY || document.documentElement.scrollTop || document.body.scrollTop || 0) > 10;
+};
+onMounted(() => {
+    document.addEventListener('click', onClickOutside);
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
+});
+onUnmounted(() => {
+    document.removeEventListener('click', onClickOutside);
+    window.removeEventListener('scroll', onScroll);
+});
 </script>
+
+<style scoped>
+.menu-enter-active, .menu-leave-active { transition: opacity .15s ease, transform .15s ease; }
+.menu-enter-from, .menu-leave-to { opacity: 0; transform: translateY(-6px); }
+.slide-enter-active, .slide-leave-active { transition: opacity .2s ease, transform .2s ease; }
+.slide-enter-from, .slide-leave-to { opacity: 0; transform: translateY(-8px); }
+.fade-enter-active, .fade-leave-active { transition: opacity .2s ease; }
+.fade-enter-from, .fade-leave-to { opacity: 0; }
+</style>
