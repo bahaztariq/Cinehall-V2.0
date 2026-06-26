@@ -1,35 +1,40 @@
 <template>
-    <div>
+    <div class="bg-surface min-h-full">
         <!-- Modal -->
         <div v-if="modal.show" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm" @click.self="closeModal">
-            <div class="bg-[#111] border border-white/10 rounded-2xl p-8 w-full max-w-md shadow-2xl space-y-6">
+            <div role="dialog" aria-modal="true" aria-labelledby="room-modal-title" class="bg-surface-container border border-outline-variant rounded-3xl p-8 w-full max-w-md shadow-2xl space-y-6">
                 <div class="flex justify-between items-center">
-                    <h2 class="text-2xl font-black uppercase italic tracking-tighter">{{ modal.mode === 'create' ? 'Add Room' : 'Edit Room' }}</h2>
-                    <button @click="closeModal" class="text-gray-500 hover:text-white text-xl">✕</button>
+                    <h2 id="room-modal-title" class="font-serif text-2xl font-bold tracking-tight text-on-surface">{{ modal.mode === 'create' ? 'Add Room' : 'Edit Room' }}</h2>
+                    <button @click="closeModal" aria-label="Close" class="w-11 h-11 flex items-center justify-center rounded-xl text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-colors">
+                        <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" d="M6 6l12 12M18 6L6 18"/></svg>
+                    </button>
                 </div>
                 <form @submit.prevent="saveRoom" class="space-y-4">
                     <div>
-                        <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">Room Name</label>
-                        <input v-model="form.name" type="text" required placeholder="Hall A"
-                            class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-yellow-600 transition-all" />
+                        <label for="room-name" class="block text-[0.7rem] font-bold text-on-surface-variant uppercase tracking-widest mb-1.5">Room Name</label>
+                        <input id="room-name" v-model="form.name" type="text" required placeholder="Hall A"
+                            class="w-full bg-surface-container-low border border-outline-variant rounded-xl px-4 py-3 text-on-surface placeholder:text-on-surface-variant/60 focus:outline-none focus:border-primary transition-all" />
                     </div>
                     <div>
-                        <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">Type</label>
-                        <select v-model="form.type" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-yellow-600 transition-all">
+                        <label for="room-type" class="block text-[0.7rem] font-bold text-on-surface-variant uppercase tracking-widest mb-1.5">Type</label>
+                        <select id="room-type" v-model="form.type" class="w-full bg-surface-container-low border border-outline-variant rounded-xl px-4 py-3 text-on-surface focus:outline-none focus:border-primary transition-all">
                             <option value="Normal">Normal</option>
                             <option value="VIP">VIP</option>
                         </select>
                     </div>
                     <div>
-                        <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">Capacity (seats)</label>
-                        <input v-model.number="form.capacity" type="number" min="1" max="500" required placeholder="100"
-                            class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-yellow-600 transition-all" />
-                        <p class="text-xs text-gray-600 mt-1">This will auto-create the specified number of seats.</p>
+                        <label for="room-capacity" class="block text-[0.7rem] font-bold text-on-surface-variant uppercase tracking-widest mb-1.5">Capacity (seats)</label>
+                        <input id="room-capacity" v-model.number="form.capacity" type="number" min="1" max="500" required placeholder="100"
+                            class="w-full bg-surface-container-low border border-outline-variant rounded-xl px-4 py-3 text-on-surface placeholder:text-on-surface-variant/60 focus:outline-none focus:border-primary transition-all" />
+                        <p class="text-xs text-on-surface-variant mt-1.5">This will auto-create the specified number of seats.</p>
                     </div>
-                    <div v-if="formError" class="text-red-400 text-sm bg-red-500/10 border border-red-500/20 rounded-xl p-3">{{ formError }}</div>
+                    <div v-if="formError" class="flex items-start gap-2 text-red-400 text-sm bg-red-500/10 border border-red-500/20 rounded-xl p-3">
+                        <svg class="w-4 h-4 mt-0.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path stroke-linecap="round" d="M12 8v4m0 4h.01"/></svg>
+                        <span>{{ formError }}</span>
+                    </div>
                     <div class="flex gap-3 pt-2">
-                        <button type="button" @click="closeModal" class="flex-1 py-3 rounded-xl border border-white/10 hover:bg-white/5 font-bold uppercase tracking-widest text-sm">Cancel</button>
-                        <button type="submit" :disabled="saving" class="flex-1 bg-yellow-600 hover:bg-yellow-700 disabled:opacity-50 text-white font-black py-3 rounded-xl uppercase tracking-widest text-sm">
+                        <button type="button" @click="closeModal" class="flex-1 py-3 rounded-xl border border-outline-variant text-on-surface hover:bg-surface-container-high font-bold uppercase tracking-widest text-sm transition-colors">Cancel</button>
+                        <button type="submit" :disabled="saving" class="flex-1 gold-gradient hover:opacity-90 disabled:opacity-50 font-bold py-3 rounded-xl uppercase tracking-widest text-sm transition-opacity">
                             {{ saving ? 'Saving...' : modal.mode === 'create' ? 'Create' : 'Update' }}
                         </button>
                     </div>
@@ -38,42 +43,72 @@
         </div>
 
         <div v-if="loading" class="flex justify-center items-center h-64">
-            <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-yellow-600"></div>
+            <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
         </div>
 
         <div v-else class="space-y-8">
-            <div class="flex flex-col md:flex-row justify-between items-start gap-4">
-                <h1 class="text-4xl font-black uppercase italic tracking-tighter">Room <span class="text-yellow-600">Management</span></h1>
-                <button @click="openCreate" class="bg-yellow-600 hover:bg-yellow-700 text-white font-black px-6 py-3 rounded-xl transition-all shadow-lg shadow-yellow-600/20 uppercase tracking-widest text-sm">
-                    + Add Room
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                <div class="space-y-1">
+                    <p class="text-[0.7rem] font-bold text-primary uppercase tracking-[0.2em]">Auditoriums</p>
+                    <h1 class="font-serif text-4xl font-bold tracking-tight text-on-surface">Room <span class="text-primary">Management</span></h1>
+                </div>
+                <button @click="openCreate" class="gold-gradient hover:opacity-90 font-bold px-6 py-3 rounded-xl transition-opacity shadow-lg shadow-black/40 uppercase tracking-widest text-sm flex items-center gap-2">
+                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path stroke-linecap="round" d="M12 5v14M5 12h14"/></svg>
+                    Add Room
                 </button>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <div v-for="room in rooms" :key="room.id" class="bg-white/5 border border-white/10 p-6 rounded-2xl hover:border-yellow-600/50 transition-all flex flex-col justify-between gap-6">
+            <!-- Empty state -->
+            <div v-if="!rooms.length" class="flex flex-col items-center justify-center text-center py-20 bg-surface-container border border-dashed border-outline-variant rounded-2xl">
+                <div class="w-14 h-14 rounded-2xl bg-surface-container-high flex items-center justify-center mb-4">
+                    <svg class="w-7 h-7 text-on-surface-variant" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M3 10v6m18-6v6M5 16v2m14-2v2M3 13h18M7 13v-3h10v3"/></svg>
+                </div>
+                <h3 class="font-serif text-xl text-on-surface mb-1">No rooms yet</h3>
+                <p class="text-on-surface-variant text-sm">Create your first auditorium to start scheduling screenings.</p>
+            </div>
+
+            <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div v-for="room in rooms" :key="room.id" class="bg-surface-container border border-outline-variant rounded-2xl p-6 hover:border-primary/50 transition-all flex flex-col justify-between gap-6">
                     <div>
-                        <div class="flex justify-between items-start mb-4">
-                            <h3 class="text-2xl font-black text-white italic uppercase">{{ room.name }}</h3>
-                            <span :class="room.type === 'VIP' ? 'bg-yellow-600/10 text-yellow-600 border-yellow-600/30' : 'bg-white/5 text-gray-400 border-white/10'" class="px-3 py-1 rounded-full border text-xs font-bold uppercase tracking-widest">{{ room.type }}</span>
-                        </div>
-                        <div class="flex gap-3">
-                            <div class="flex-1 bg-black/20 p-3 rounded-xl text-center">
-                                <p class="text-[0.65rem] font-bold text-gray-500 uppercase tracking-widest mb-1">Capacity</p>
-                                <p class="text-2xl font-black text-yellow-600 italic">{{ room.capacity }}</p>
+                        <div class="flex justify-between items-start gap-3 mb-5">
+                            <div class="flex items-center gap-3 min-w-0">
+                                <div :class="room.type === 'VIP' ? 'bg-primary/15 text-primary' : 'bg-surface-container-high text-on-surface-variant'" class="w-11 h-11 rounded-xl flex items-center justify-center shrink-0">
+                                    <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M3 10v6m18-6v6M5 16v2m14-2v2M3 13h18M7 13v-3h10v3"/></svg>
+                                </div>
+                                <h3 class="font-serif text-2xl font-bold text-on-surface truncate">{{ room.name }}</h3>
                             </div>
-                            <div class="flex-1 bg-black/20 p-3 rounded-xl text-center">
-                                <p class="text-[0.65rem] font-bold text-gray-500 uppercase tracking-widest mb-1">Seats</p>
-                                <p class="text-2xl font-black text-white italic">{{ room.seats?.length || room.capacity }}</p>
+                            <span :class="room.type === 'VIP' ? 'bg-primary/15 text-primary border-primary/40' : 'bg-surface-container-high text-on-surface-variant border-outline-variant'" class="inline-flex items-center gap-1 px-3 py-1 rounded-full border text-[0.65rem] font-bold uppercase tracking-widest shrink-0">
+                                <svg v-if="room.type === 'VIP'" class="w-3 h-3" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="m12 2 2.9 6.3L22 9.3l-5 4.9 1.2 7L12 17.8 5.8 21.2 7 14.2l-5-4.9 7.1-1z"/></svg>
+                                {{ room.type }}
+                            </span>
+                        </div>
+                        <div class="grid grid-cols-2 gap-3">
+                            <div class="bg-surface-container-low border border-outline-variant p-4 rounded-xl">
+                                <div class="flex items-center gap-1.5 text-[0.6rem] font-bold text-on-surface-variant uppercase tracking-widest mb-1.5">
+                                    <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8Zm14 10v-2a4 4 0 0 0-3-3.87M16 3.13A4 4 0 0 1 16 11"/></svg>
+                                    Capacity
+                                </div>
+                                <p class="font-serif text-2xl font-bold text-primary">{{ room.capacity }}</p>
+                            </div>
+                            <div class="bg-surface-container-low border border-outline-variant p-4 rounded-xl">
+                                <div class="flex items-center gap-1.5 text-[0.6rem] font-bold text-on-surface-variant uppercase tracking-widest mb-1.5">
+                                    <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M4 10v8h16v-8M4 10V7a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v3M4 10h16M8 18v2m8-2v2"/></svg>
+                                    Seats
+                                </div>
+                                <p class="font-serif text-2xl font-bold text-on-surface">{{ room.seats?.length || room.capacity }}</p>
                             </div>
                         </div>
                     </div>
                     <div class="flex gap-2">
-                        <button @click="openEdit(room)" class="flex-1 py-2 bg-white/5 hover:bg-white/10 rounded-lg font-bold text-xs uppercase tracking-widest border border-white/10 transition-all">Edit</button>
-                        <button @click="deleteRoom(room.id)" class="flex-1 py-2 bg-red-600/10 hover:bg-red-600 text-white rounded-lg font-bold text-xs uppercase tracking-widest border border-red-600/20 transition-all">Delete</button>
+                        <button @click="openEdit(room)" class="flex-1 py-3 bg-surface-container-high hover:bg-surface-container-highest text-on-surface rounded-xl font-bold text-xs uppercase tracking-widest border border-outline-variant transition-colors flex items-center justify-center gap-2">
+                            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+                            Edit
+                        </button>
+                        <button @click="deleteRoom(room.id)" class="flex-1 py-3 bg-red-500/15 hover:bg-red-600 text-red-400 hover:text-white rounded-xl font-bold text-xs uppercase tracking-widest border border-red-500/30 transition-colors flex items-center justify-center gap-2">
+                            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" d="M3 6h18M8 6V4h8v2m-9 0 1 14h8l1-14"/></svg>
+                            Delete
+                        </button>
                     </div>
-                </div>
-                <div v-if="!rooms.length" class="col-span-full text-center py-16 border border-white/10 border-dashed rounded-2xl text-gray-500 italic">
-                    No rooms found. Add one above.
                 </div>
             </div>
         </div>
