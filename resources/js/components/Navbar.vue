@@ -57,7 +57,7 @@
                     </router-link>
                     <div class="relative ml-1" ref="menuRef">
                         <button @click="menuOpen = !menuOpen" aria-label="Account menu" :aria-expanded="menuOpen" class="flex items-center gap-2 pl-1 pr-2 py-1 rounded-full hover:bg-surface-container transition-colors cursor-pointer">
-                            <span class="w-8 h-8 rounded-full gold-gradient flex items-center justify-center text-xs font-black uppercase">{{ initial }}</span>
+                            <span class="w-8 h-8 rounded-full blue-gradient flex items-center justify-center text-xs font-black uppercase">{{ initial }}</span>
                             <span class="material-symbols-outlined text-[18px] text-on-surface-variant" aria-hidden="true">{{ menuOpen ? 'expand_less' : 'expand_more' }}</span>
                         </button>
                         <transition name="menu">
@@ -83,7 +83,7 @@
                     <router-link to="/login" class="ml-1 px-4 py-2 rounded-full text-on-surface-variant hover:text-on-surface font-bold uppercase tracking-widest text-[0.65rem] transition-colors">
                         Sign In
                     </router-link>
-                    <router-link to="/register" class="gold-gradient px-5 py-2 rounded-full font-bold uppercase tracking-widest text-[0.65rem] hover:brightness-110 active:scale-95 transition-all">
+                    <router-link to="/register" class="blue-gradient px-5 py-2 rounded-full font-bold uppercase tracking-widest text-[0.65rem] hover:brightness-110 active:scale-95 transition-all">
                         Join
                     </router-link>
                 </template>
@@ -123,7 +123,7 @@
                 <template v-else>
                     <div class="flex gap-3 pt-2">
                         <router-link to="/login" @click="mobileMenu = false" class="flex-1 text-center px-4 py-3 rounded-full border border-outline-variant text-on-surface font-bold uppercase tracking-widest text-xs">Sign In</router-link>
-                        <router-link to="/register" @click="mobileMenu = false" class="flex-1 text-center gold-gradient px-4 py-3 rounded-full font-bold uppercase tracking-widest text-xs">Join</router-link>
+                        <router-link to="/register" @click="mobileMenu = false" class="flex-1 text-center blue-gradient px-4 py-3 rounded-full font-bold uppercase tracking-widest text-xs">Join</router-link>
                     </div>
                 </template>
             </div>
