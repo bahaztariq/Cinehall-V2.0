@@ -41,7 +41,7 @@
 
                     <div class="flex gap-3 pt-2">
                         <button type="button" @click="closeModal" class="flex-1 py-3.5 rounded-xl border border-outline-variant hover:bg-surface-container-high text-xs font-bold uppercase tracking-widest text-on-surface transition-colors cursor-pointer min-h-[44px]">Cancel</button>
-                        <button type="submit" :disabled="saving" class="flex-1 gold-gradient hover:opacity-90 disabled:opacity-50 font-bold py-3.5 rounded-xl text-xs uppercase tracking-widest transition-opacity cursor-pointer min-h-[44px]">
+                        <button type="submit" :disabled="saving" class="flex-1 blue-gradient hover:opacity-90 disabled:opacity-50 font-bold py-3.5 rounded-xl text-xs uppercase tracking-widest transition-opacity cursor-pointer min-h-[44px]">
                             {{ saving ? 'Saving...' : modal.mode === 'create' ? 'Create' : 'Update' }}
                         </button>
                     </div>
@@ -55,7 +55,7 @@
                 <p class="text-[0.7rem] font-bold text-primary uppercase tracking-[0.2em]">Marketing</p>
                 <h1 class="font-serif text-4xl font-bold tracking-tight">Promotion <span class="text-primary">Management</span></h1>
             </div>
-            <button @click="openCreate" class="flex items-center justify-center gap-2 gold-gradient hover:opacity-90 font-bold px-6 py-3.5 rounded-xl transition-opacity shadow-lg shadow-primary/20 uppercase tracking-widest text-xs cursor-pointer min-h-[44px]">
+            <button @click="openCreate" class="flex items-center justify-center gap-2 blue-gradient hover:opacity-90 font-bold px-6 py-3.5 rounded-xl transition-opacity shadow-lg shadow-primary/20 uppercase tracking-widest text-xs cursor-pointer min-h-[44px]">
                 <span class="material-symbols-outlined text-[20px]" aria-hidden="true">add</span>
                 Add Promotion
             </button>

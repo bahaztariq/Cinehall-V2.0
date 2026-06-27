@@ -5,8 +5,8 @@
             <div role="dialog" aria-modal="true" aria-labelledby="tmdb-modal-title" class="bg-surface-container border border-outline-variant rounded-3xl p-8 w-full max-w-2xl shadow-2xl space-y-6 max-h-[85vh] flex flex-col" @click.stop>
                 <div class="flex justify-between items-center shrink-0">
                     <div class="space-y-1">
-                        <p class="text-[0.65rem] font-bold text-cinema-gold uppercase tracking-[0.2em]">Global Database</p>
-                        <h2 id="tmdb-modal-title" class="font-serif text-2xl font-bold tracking-tight text-white">Import from <span class="text-cinema-gold">TMDB</span></h2>
+                        <p class="text-[0.65rem] font-bold text-cinema-blue uppercase tracking-[0.2em]">Global Database</p>
+                        <h2 id="tmdb-modal-title" class="font-serif text-2xl font-bold tracking-tight text-white">Import from <span class="text-cinema-blue">TMDB</span></h2>
                     </div>
                     <button @click="closeTmdbModal" aria-label="Close" class="w-11 h-11 flex items-center justify-center rounded-xl text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-colors cursor-pointer">
                         <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path stroke-linecap="round" d="M6 6l12 12M18 6L6 18"/></svg>
@@ -24,7 +24,7 @@
                         placeholder="Search global movie database (e.g. Dune)..."
                         class="w-full glass-input rounded-2xl px-5 py-3.5 pr-12 text-sm text-white placeholder:text-on-surface-variant/60"
                     />
-                    <button @click="searchTmdb" :disabled="tmdbModal.searching" aria-label="Search" class="absolute right-3 top-1/2 -translate-y-1/2 w-9 h-9 flex items-center justify-center rounded-lg text-on-surface-variant hover:text-cinema-gold transition-colors disabled:opacity-50">
+                    <button @click="searchTmdb" :disabled="tmdbModal.searching" aria-label="Search" class="absolute right-3 top-1/2 -translate-y-1/2 w-9 h-9 flex items-center justify-center rounded-lg text-on-surface-variant hover:text-cinema-blue transition-colors disabled:opacity-50">
                         <svg class="w-5 h-5 fill-none stroke-current" viewBox="0 0 24 24" stroke-width="2.5" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path stroke-linecap="round" d="m21 21-4.35-4.35"/></svg>
                     </button>
                 </div>
@@ -32,20 +32,20 @@
                 <!-- TMDB Results List -->
                 <div class="overflow-y-auto flex-1 space-y-3 pr-1">
                     <div v-if="tmdbModal.searching" class="flex justify-center items-center py-12">
-                        <div class="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-cinema-gold"></div>
+                        <div class="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-cinema-blue"></div>
                     </div>
                     <template v-else-if="tmdbModal.results.length">
-                        <div v-for="movie in tmdbModal.results" :key="movie.id" class="bg-surface-container-low border border-outline-variant p-4 rounded-2xl flex gap-4 hover:border-cinema-gold/30 transition-all items-center">
+                        <div v-for="movie in tmdbModal.results" :key="movie.id" class="bg-surface-container-low border border-outline-variant p-4 rounded-2xl flex gap-4 hover:border-cinema-blue/30 transition-all items-center">
                             <img :src="movie.poster_path ? 'https://image.tmdb.org/t/p/w92' + movie.poster_path : 'https://via.placeholder.com/92x138?text=No+Poster'" :alt="movie.title" class="w-16 h-24 object-cover rounded-lg border border-outline-variant shrink-0" />
                             <div class="flex-1 space-y-1 min-w-0">
                                 <h4 class="font-bold text-white truncate text-base leading-tight">{{ movie.title }}</h4>
-                                <p class="text-xs text-cinema-gold font-bold uppercase tracking-wider">{{ movie.release_date || 'N/A' }}</p>
+                                <p class="text-xs text-cinema-blue font-bold uppercase tracking-wider">{{ movie.release_date || 'N/A' }}</p>
                                 <p class="text-xs text-on-surface-variant line-clamp-2 leading-relaxed">{{ movie.overview }}</p>
                             </div>
                             <button
                                 @click="importMovie(movie.id)"
                                 :disabled="tmdbModal.importing[movie.id]"
-                                class="px-5 py-3 gold-gradient hover:opacity-90 font-bold uppercase text-[0.65rem] tracking-widest rounded-xl transition-opacity disabled:opacity-30 shrink-0 cursor-pointer flex items-center gap-1.5"
+                                class="px-5 py-3 blue-gradient hover:opacity-90 font-bold uppercase text-[0.65rem] tracking-widest rounded-xl transition-opacity disabled:opacity-30 shrink-0 cursor-pointer flex items-center gap-1.5"
                             >
                                 <svg v-if="!tmdbModal.importing[movie.id]" class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M12 5v10m0 0-4-4m4 4 4-4M5 19h14"/></svg>
                                 {{ tmdbModal.importing[movie.id] ? 'Importing...' : 'Import' }}
@@ -118,7 +118,7 @@
                                 v-for="genre in genres" :key="genre.id"
                                 type="button"
                                 @click="toggleGenre(genre.id)"
-                                :class="form.genres.includes(genre.id) ? 'bg-cinema-gold text-black border-cinema-gold' : 'bg-surface-container-low border-outline-variant text-on-surface-variant hover:border-cinema-gold/40'"
+                                :class="form.genres.includes(genre.id) ? 'bg-cinema-blue text-black border-cinema-blue' : 'bg-surface-container-low border-outline-variant text-on-surface-variant hover:border-cinema-blue/40'"
                                 class="px-3.5 py-1.5 rounded-full border text-[0.65rem] font-bold uppercase tracking-wider transition-all cursor-pointer"
                             >{{ genre.name }}</button>
                         </div>
@@ -126,7 +126,7 @@
                     <div>
                         <label for="film-image" class="block text-[0.7rem] font-bold text-on-surface-variant uppercase tracking-widest mb-1.5">Poster Image</label>
                         <input id="film-image" type="file" @change="onFile" accept="image/*" ref="fileInput"
-                            class="w-full glass-input rounded-xl px-4 py-3 text-white text-xs file:mr-4 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-[0.65rem] file:font-bold file:bg-cinema-gold file:text-black cursor-pointer" />
+                            class="w-full glass-input rounded-xl px-4 py-3 text-white text-xs file:mr-4 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-[0.65rem] file:font-bold file:bg-cinema-blue file:text-black cursor-pointer" />
                     </div>
 
                     <div v-if="formError" class="flex items-start gap-2 text-red-400 text-sm bg-red-500/10 border border-red-500/20 rounded-xl p-3">
@@ -136,7 +136,7 @@
 
                     <div class="flex gap-3 pt-2">
                         <button type="button" @click="closeModal" class="flex-1 py-3.5 rounded-xl border border-outline-variant hover:bg-surface-container-high text-xs font-bold uppercase tracking-widest text-white transition-colors cursor-pointer">Cancel</button>
-                        <button type="submit" :disabled="saving" class="flex-1 gold-gradient hover:opacity-90 disabled:opacity-50 font-bold py-3.5 rounded-xl text-xs uppercase tracking-widest transition-opacity cursor-pointer">
+                        <button type="submit" :disabled="saving" class="flex-1 blue-gradient hover:opacity-90 disabled:opacity-50 font-bold py-3.5 rounded-xl text-xs uppercase tracking-widest transition-opacity cursor-pointer">
                             {{ saving ? 'Saving...' : modal.mode === 'create' ? 'Create Film' : 'Update Film' }}
                         </button>
                     </div>
@@ -145,14 +145,14 @@
         </div>
 
         <div v-if="loading" class="flex justify-center items-center h-64">
-            <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-cinema-gold"></div>
+            <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-cinema-blue"></div>
         </div>
 
         <div v-else class="space-y-8">
             <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                 <div class="space-y-1">
-                    <p class="text-[0.7rem] font-bold text-cinema-gold uppercase tracking-[0.2em]">Catalogue</p>
-                    <h1 class="font-serif text-4xl font-bold tracking-tight text-white">Film <span class="text-cinema-gold">Management</span></h1>
+                    <p class="text-[0.7rem] font-bold text-cinema-blue uppercase tracking-[0.2em]">Catalogue</p>
+                    <h1 class="font-serif text-4xl font-bold tracking-tight text-white">Film <span class="text-cinema-blue">Management</span></h1>
                 </div>
 
                 <div class="flex gap-3 w-full md:w-auto">
@@ -160,7 +160,7 @@
                         <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path stroke-linecap="round" d="m21 21-4.35-4.35"/></svg>
                         Import from TMDB
                     </button>
-                    <button @click="openCreate" class="flex-1 md:flex-none flex items-center justify-center gap-2 gold-gradient hover:opacity-90 font-bold px-6 py-3.5 rounded-xl transition-opacity shadow-lg shadow-cinema-gold/20 uppercase tracking-widest text-xs cursor-pointer">
+                    <button @click="openCreate" class="flex-1 md:flex-none flex items-center justify-center gap-2 blue-gradient hover:opacity-90 font-bold px-6 py-3.5 rounded-xl transition-opacity shadow-lg shadow-cinema-blue/20 uppercase tracking-widest text-xs cursor-pointer">
                         <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path stroke-linecap="round" d="M12 5v14M5 12h14"/></svg>
                         Add New Film
                     </button>
@@ -178,12 +178,12 @@
 
             <!-- Film Cards Grid -->
             <div v-else class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                <div v-for="film in films" :key="film.id" class="bg-surface-container border border-outline-variant rounded-2xl overflow-hidden hover:border-cinema-gold/40 transition-all duration-300 group flex flex-col h-full justify-between">
+                <div v-for="film in films" :key="film.id" class="bg-surface-container border border-outline-variant rounded-2xl overflow-hidden hover:border-cinema-blue/40 transition-all duration-300 group flex flex-col h-full justify-between">
                     <div>
                         <div class="aspect-2/3 relative overflow-hidden bg-cinema-dark">
                             <img :src="getImageUrl(film.image)" :alt="film.title" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                             <!-- Rating badge -->
-                            <span class="absolute top-3 left-3 inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-black/70 backdrop-blur-sm border border-cinema-gold/40 text-cinema-gold text-[0.6rem] font-bold uppercase tracking-widest">
+                            <span class="absolute top-3 left-3 inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-black/70 backdrop-blur-sm border border-cinema-blue/40 text-cinema-blue text-[0.6rem] font-bold uppercase tracking-widest">
                                 <svg class="w-3 h-3" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="m12 2 2.9 6.3L22 9.3l-5 4.9 1.2 7L12 17.8 5.8 21.2 7 14.2l-5-4.9 7.1-1z"/></svg>
                                 {{ film.rate }}
                             </span>
@@ -210,7 +210,7 @@
                                 <span v-for="g in film.genres.slice(0, 2)" :key="g.id" class="px-2 py-0.5 rounded-full bg-surface-container-high text-on-surface-variant text-[0.6rem] font-bold uppercase tracking-wider">{{ g.name }}</span>
                             </div>
                             <div class="flex items-center gap-1.5 text-[0.65rem] text-on-surface-variant font-bold uppercase tracking-wider pt-1">
-                                <svg class="w-3.5 h-3.5 text-cinema-gold" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path stroke-linecap="round" d="M12 7v5l3 2"/></svg>
+                                <svg class="w-3.5 h-3.5 text-cinema-blue" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path stroke-linecap="round" d="M12 7v5l3 2"/></svg>
                                 {{ film.duration }} min
                             </div>
                         </div>
