@@ -5,7 +5,7 @@
         <p class="text-on-surface-variant text-sm sm:text-base mb-8 max-w-md mx-auto">
             The page you're looking for doesn't exist or has been moved to another dimension.
         </p>
-        <router-link to="/" class="inline-block gold-gradient px-8 py-3 rounded-xl font-bold uppercase tracking-widest transition-all shadow-[0_8px_30px_rgba(0,0,0,0.45)]">
+        <router-link to="/" class="inline-block blue-gradient px-8 py-3 rounded-xl font-bold uppercase tracking-widest transition-all shadow-[0_8px_30px_rgba(0,0,0,0.45)]">
             Back to Home
         </router-link>
     </div>

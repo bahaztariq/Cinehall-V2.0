@@ -140,7 +140,7 @@
                                 :aria-label="`Show screenings for ${d.weekday} ${d.day}`"
                                 class="flex flex-col items-center justify-center min-w-[65px] min-h-[64px] rounded-xl shrink-0 transition-colors"
                                 :class="selectedDate === d.key
-                                    ? 'gold-gradient shadow-sm'
+                                    ? 'blue-gradient shadow-sm'
                                     : 'bg-surface-container-low text-on-surface-variant border border-outline-variant/40 hover:border-primary'"
                             >
                                 <span class="text-[9px] font-bold">{{ d.weekday }}</span>
@@ -170,7 +170,7 @@
                                         <span class="font-serif text-lg font-bold text-primary">${{ session.price }}</span>
                                         <router-link 
                                             :to="'/reservation/' + session.id" 
-                                            class="px-5 py-2.5 gold-gradient rounded-lg font-bold text-xs uppercase tracking-widest hover:brightness-105 active:scale-[0.98] transition-all shadow-sm shadow-primary/10"
+                                            class="px-5 py-2.5 blue-gradient rounded-lg font-bold text-xs uppercase tracking-widest hover:brightness-105 active:scale-[0.98] transition-all shadow-sm shadow-primary/10"
                                         >
                                             Select Seats
                                         </router-link>

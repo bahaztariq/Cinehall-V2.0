@@ -24,7 +24,7 @@
                 <!-- Trailer plays on hover (muted, looping); poster shows otherwise -->
                 <div
                     v-if="idx === currentSlide && hovered && getEmbedId(film.trailer)"
-                    class="absolute inset-0 z-[1] overflow-hidden bg-black pointer-events-none"
+                    class="absolute inset-0 z-1 overflow-hidden bg-black pointer-events-none"
                 >
                     <iframe
                         :src="bgTrailerSrc(film.trailer)"
@@ -65,7 +65,7 @@
                     <div class="flex flex-col sm:flex-row sm:flex-wrap gap-3 sm:gap-4 pt-2">
                         <router-link
                             :to="'/Film/' + film.id"
-                            class="px-8 min-h-[48px] inline-flex items-center justify-center gold-gradient text-xs font-bold uppercase tracking-widest rounded-lg hover:brightness-110 shadow-lg transition-all active:scale-95"
+                            class="px-8 min-h-[48px] inline-flex items-center justify-center blue-gradient text-xs font-bold uppercase tracking-widest rounded-lg hover:brightness-110 shadow-lg transition-all active:scale-95"
                         >
                             Book Tickets
                         </router-link>
@@ -338,7 +338,7 @@
                 </div>
 
                 <div class="shrink-0 space-y-3 w-full md:w-auto relative z-10">
-                    <router-link to="/register" class="block text-center px-10 py-4 gold-gradient text-xs font-bold uppercase tracking-widest rounded-lg hover:brightness-110 shadow-lg transition-all scale-95 active:scale-90">
+                    <router-link to="/register" class="block text-center px-10 py-4 blue-gradient text-xs font-bold uppercase tracking-widest rounded-lg hover:brightness-110 shadow-lg transition-all scale-95 active:scale-90">
                         Join Circle Free
                     </router-link>
                     <p class="text-center text-[10px] text-outline uppercase tracking-widest">No membership fees required.</p>
