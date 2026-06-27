@@ -34,7 +34,7 @@
                     </div>
                     <div class="flex gap-3 pt-2">
                         <button type="button" @click="closeModal" class="flex-1 py-3 rounded-xl border border-outline-variant text-on-surface hover:bg-surface-container-high font-bold uppercase tracking-widest text-sm transition-colors">Cancel</button>
-                        <button type="submit" :disabled="saving" class="flex-1 gold-gradient hover:opacity-90 disabled:opacity-50 font-bold py-3 rounded-xl uppercase tracking-widest text-sm transition-opacity">
+                        <button type="submit" :disabled="saving" class="flex-1 blue-gradient hover:opacity-90 disabled:opacity-50 font-bold py-3 rounded-xl uppercase tracking-widest text-sm transition-opacity">
                             {{ saving ? 'Saving...' : modal.mode === 'create' ? 'Create' : 'Update' }}
                         </button>
                     </div>
@@ -52,7 +52,7 @@
                     <p class="text-[0.7rem] font-bold text-primary uppercase tracking-[0.2em]">Auditoriums</p>
                     <h1 class="font-serif text-4xl font-bold tracking-tight text-on-surface">Room <span class="text-primary">Management</span></h1>
                 </div>
-                <button @click="openCreate" class="gold-gradient hover:opacity-90 font-bold px-6 py-3 rounded-xl transition-opacity shadow-lg shadow-black/40 uppercase tracking-widest text-sm flex items-center gap-2">
+                <button @click="openCreate" class="blue-gradient hover:opacity-90 font-bold px-6 py-3 rounded-xl transition-opacity shadow-lg shadow-black/40 uppercase tracking-widest text-sm flex items-center gap-2">
                     <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path stroke-linecap="round" d="M12 5v14M5 12h14"/></svg>
                     Add Room
                 </button>
