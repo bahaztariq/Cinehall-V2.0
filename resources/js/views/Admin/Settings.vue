@@ -57,7 +57,7 @@
             </p>
 
             <div class="flex justify-end pt-2 border-t border-outline-variant">
-                <button type="submit" :disabled="saving" class="mt-6 inline-flex items-center justify-center gap-2 gold-gradient hover:opacity-90 disabled:opacity-50 font-bold px-8 py-3.5 rounded-xl text-xs uppercase tracking-widest transition-opacity cursor-pointer min-h-[44px]">
+                <button type="submit" :disabled="saving" class="mt-6 inline-flex items-center justify-center gap-2 blue-gradient hover:opacity-90 disabled:opacity-50 font-bold px-8 py-3.5 rounded-xl text-xs uppercase tracking-widest transition-opacity cursor-pointer min-h-[44px]">
                     <span class="material-symbols-outlined text-[20px]" aria-hidden="true">save</span>
                     {{ saving ? 'Saving...' : 'Save Changes' }}
                 </button>

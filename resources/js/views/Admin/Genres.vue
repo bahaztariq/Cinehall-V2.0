@@ -22,7 +22,7 @@
                 placeholder="Add a genre (e.g. Western)"
                 class="flex-1 bg-surface-container-low border border-outline-variant rounded-xl px-4 py-3 text-sm text-on-surface placeholder:text-on-surface-variant/60 focus:border-primary outline-none"
             />
-            <button type="submit" :disabled="!newName.trim() || saving" class="gold-gradient px-5 py-3 rounded-xl font-bold uppercase tracking-widest text-xs hover:brightness-110 transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer">
+            <button type="submit" :disabled="!newName.trim() || saving" class="blue-gradient px-5 py-3 rounded-xl font-bold uppercase tracking-widest text-xs hover:brightness-110 transition-all disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer">
                 {{ saving ? 'Adding...' : 'Add' }}
             </button>
         </form>
