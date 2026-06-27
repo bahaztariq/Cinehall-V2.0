@@ -14,11 +14,11 @@
     /* Custom spacing token (used as px-margin-desktop) */
     --spacing-margin-desktop: 2rem;
 
-    /* ── Brand: spotlight gold ── */
-    --color-primary: #d4a017;          /* gold accent / headings */
-    --color-primary-hover: #eab308;    /* brighter gold on hover */
-    --color-on-primary: #1a1407;       /* dark text on gold surfaces (AA on gold) */
-    --color-secondary-container: #312e81; /* indigo accent chip */
+    /* ── Brand: spotlight blue ── */
+    --color-primary: #3b82f6;          /* blue accent / headings */
+    --color-primary-hover: #60a5fa;    /* brighter blue on hover */
+    --color-on-primary: #ffffff;       /* light text on blue surfaces */
+    --color-secondary-container: #1e3a8a; /* deep navy accent chip */
 
     /* ── Dark cinematic surfaces (OLED-friendly) ── */
     --color-surface: #0b0b18;                  /* page background, near-black */
@@ -36,11 +36,11 @@
     --color-outline: #6f6a8a;             /* visible borders / icons */
     --color-outline-variant: #322f4d;     /* subtle dividers */
 
-    --color-ring: #d4a017;
+    --color-ring: #3b82f6;
 
     /* ── Aliases for the admin "cinema" token set (Films.vue) ── */
-    --color-cinema-gold: #d4a017;
-    --color-cinema-gold-hover: #eab308;
+    --color-cinema-blue: #3b82f6;
+    --color-cinema-blue-hover: #60a5fa;
     --color-cinema-dark: #1a1830;
     --color-cinema-black: #0b0b18;
 }
@@ -76,9 +76,9 @@ body {
     background: var(--color-primary);
 }
 
-/* ── Gold gradient (default dark text for AA contrast) ── */
-.gold-gradient {
-    background: linear-gradient(135deg, #f2c94c 0%, #d4a017 55%, #a47c10 100%);
+/* ── Blue gradient ── */
+.blue-gradient {
+    background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 55%, #1d4ed8 100%);
     color: var(--color-on-primary);
 }
 
@@ -104,9 +104,9 @@ body {
     backdrop-filter: blur(8px);
 }
 
-/* Subtle gold glow on hovered media */
+/* Subtle blue glow on hovered media */
 .movie-card-glow:hover {
-    box-shadow: 0 0 24px rgba(212, 160, 23, 0.18);
+    box-shadow: 0 0 24px rgba(59, 130, 246, 0.18);
     border-color: var(--color-primary);
 }
 
@@ -148,4 +148,49 @@ body {
         transition-duration: 0.01ms !important;
         scroll-behavior: auto !important;
     }
+}
+
+/* ── Light Mode theme variables override ── */
+html.light {
+    --color-surface: #f8fafc;                  /* Slate-50 page bg */
+    --color-surface-container-lowest: #ffffff;
+    --color-surface-container-low: #f1f5f9;    /* Slate-100 */
+    --color-surface-container: #ffffff;        /* White card bg */
+    --color-surface-container-high: #e2e8f0;   /* Slate-200 */
+    --color-surface-container-highest: #cbd5e1; /* Slate-300 */
+
+    /* ── Text on light ── */
+    --color-on-surface: #0f172a;               /* Slate-900 */
+    --color-on-surface-variant: #475569;       /* Slate-600 */
+
+    /* ── Lines ── */
+    --color-outline: #94a3b8;                  /* Slate-400 */
+    --color-outline-variant: #e2e8f0;          /* Slate-200 */
+
+    /* ── Aliases ── */
+    --color-cinema-dark: #f1f5f9;
+    --color-cinema-black: #f8fafc;
+    
+    /* ── Chip Containers ── */
+    --color-secondary-container: #dbeafe;      /* Light blue container */
+}
+
+/* Light mode support for glass components and inputs */
+html.light .glass-input {
+    background: rgba(0, 0, 0, 0.03);
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    color: var(--color-on-surface);
+}
+html.light .glass-input:focus {
+    background: rgba(0, 0, 0, 0.05);
+    border-color: var(--color-primary);
+}
+html.light .glass-panel {
+    background: rgba(255, 255, 255, 0.6);
+    backdrop-filter: blur(8px);
+    border-color: rgba(0, 0, 0, 0.08);
+}
+html.light input::placeholder,
+html.light textarea::placeholder {
+    color: rgba(71, 85, 105, 0.6);
 }
