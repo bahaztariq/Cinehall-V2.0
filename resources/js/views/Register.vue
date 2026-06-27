@@ -17,7 +17,7 @@
                 <!-- Form -->
                 <form @submit.prevent="handleRegister" class="flex flex-col gap-6">
                     <!-- Full Name Input -->
-                    <div class="relative group">
+                    <div class="relative group space-y-1.5">
                         <label class="text-[10px] uppercase tracking-widest text-outline transition-colors group-focus-within:text-primary font-bold block" for="name">Full Name</label>
                         <input 
                             v-model="form.name" 
@@ -25,13 +25,13 @@
                             id="name"
                             autocomplete="name"
                             required
-                            class="w-full bg-transparent border-t-0 border-x-0 border-b border-outline-variant focus:border-primary focus:ring-0 px-0 py-3 font-sans transition-all duration-300 placeholder:text-on-surface-variant/60 text-base text-on-surface"
+                            class="w-full bg-surface-container-low border border-outline-variant rounded-xl px-4 py-3 focus:outline-none focus:border-primary transition-all duration-300 placeholder:text-on-surface-variant/60 text-sm text-on-surface"
                             placeholder="Alexander Mercer"
                         />
                     </div>
 
                     <!-- Email Input -->
-                    <div class="relative group">
+                    <div class="relative group space-y-1.5">
                         <label class="text-[10px] uppercase tracking-widest text-outline transition-colors group-focus-within:text-primary font-bold block" for="email">Email Address</label>
                         <input 
                             v-model="form.email" 
@@ -39,13 +39,13 @@
                             id="email"
                             autocomplete="email"
                             required
-                            class="w-full bg-transparent border-t-0 border-x-0 border-b border-outline-variant focus:border-primary focus:ring-0 px-0 py-3 font-sans transition-all duration-300 placeholder:text-on-surface-variant/60 text-base text-on-surface"
+                            class="w-full bg-surface-container-low border border-outline-variant rounded-xl px-4 py-3 focus:outline-none focus:border-primary transition-all duration-300 placeholder:text-on-surface-variant/60 text-sm text-on-surface"
                             placeholder="alexander@luxuryliving.com"
                         />
                     </div>
 
                     <!-- Password Input -->
-                    <div class="relative group">
+                    <div class="relative group space-y-1.5">
                         <label class="text-[10px] uppercase tracking-widest text-outline transition-colors group-focus-within:text-primary font-bold block" for="password">Password</label>
                         <input 
                             v-model="form.password" 
@@ -53,13 +53,13 @@
                             id="password"
                             autocomplete="new-password"
                             required
-                            class="w-full bg-transparent border-t-0 border-x-0 border-b border-outline-variant focus:border-primary focus:ring-0 px-0 py-3 font-sans transition-all duration-300 placeholder:text-on-surface-variant/60 text-base text-on-surface"
+                            class="w-full bg-surface-container-low border border-outline-variant rounded-xl px-4 py-3 focus:outline-none focus:border-primary transition-all duration-300 placeholder:text-on-surface-variant/60 text-sm text-on-surface"
                             placeholder="••••••••••••"
                         />
                     </div>
 
                     <!-- Confirm Password Input -->
-                    <div class="relative group">
+                    <div class="relative group space-y-1.5">
                         <label class="text-[10px] uppercase tracking-widest text-outline transition-colors group-focus-within:text-primary font-bold block" for="password_confirmation">Confirm Password</label>
                         <input 
                             v-model="form.password_confirmation" 
@@ -67,7 +67,7 @@
                             id="password_confirmation"
                             autocomplete="new-password"
                             required
-                            class="w-full bg-transparent border-t-0 border-x-0 border-b border-outline-variant focus:border-primary focus:ring-0 px-0 py-3 font-sans transition-all duration-300 placeholder:text-on-surface-variant/60 text-base text-on-surface"
+                            class="w-full bg-surface-container-low border border-outline-variant rounded-xl px-4 py-3 focus:outline-none focus:border-primary transition-all duration-300 placeholder:text-on-surface-variant/60 text-sm text-on-surface"
                             placeholder="••••••••••••"
                         />
                     </div>
@@ -80,7 +80,7 @@
                     <button 
                         type="submit" 
                         :disabled="loading"
-                        class="w-full mt-2 gold-gradient py-4 px-8 rounded-lg font-bold text-xs uppercase tracking-[0.2em] shadow-lg shadow-primary/20 hover:brightness-105 active:scale-[0.98] transition-all duration-300 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                        class="w-full mt-2 blue-gradient py-4 px-8 rounded-lg font-bold text-xs uppercase tracking-[0.2em] shadow-lg shadow-primary/20 hover:brightness-105 active:scale-[0.98] transition-all duration-300 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                         {{ loading ? 'Creating account...' : 'Create Account' }}
                     </button>

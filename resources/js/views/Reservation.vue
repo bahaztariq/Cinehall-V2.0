@@ -20,7 +20,7 @@
                             <span
                                 class="flex items-center justify-center w-8 h-8 rounded-full text-[11px] font-bold transition-all duration-300 border"
                                 :class="i < stepIndex
-                                    ? 'gold-gradient border-transparent'
+                                    ? 'blue-gradient border-transparent'
                                     : i === stepIndex
                                         ? 'bg-primary/15 border-primary text-primary'
                                         : 'bg-surface-container border-outline-variant/40 text-outline'"
@@ -78,7 +78,7 @@
                                 <span class="text-[10px] font-bold text-on-surface-variant uppercase tracking-[0.15em]">Available</span>
                             </div>
                             <div class="flex items-center gap-2.5">
-                                <span class="w-5 h-5 gold-gradient rounded-md" aria-hidden="true"></span>
+                                <span class="w-5 h-5 blue-gradient rounded-md" aria-hidden="true"></span>
                                 <span class="text-[10px] font-bold text-on-surface-variant uppercase tracking-[0.15em]">Selected</span>
                             </div>
                             <div class="flex items-center gap-2.5">
@@ -106,7 +106,7 @@
                                     class="seat w-11 h-11 md:w-10 md:h-10 rounded-lg border-2 transition-all duration-200 flex flex-col items-center justify-center text-[9px] font-bold shrink-0"
                                     :class="[
                                         isSeatOccupied(seat.id) ? 'bg-surface-container-highest border-surface-container-highest text-outline/40 cursor-not-allowed' :
-                                        isSelected(seat.id) ? 'seat-selected gold-gradient border-transparent shadow-lg shadow-primary/30 scale-110' :
+                                        isSelected(seat.id) ? 'seat-selected blue-gradient border-transparent shadow-lg shadow-primary/30 scale-110' :
                                         'bg-surface-container-low border-outline text-on-surface hover:border-primary hover:-translate-y-0.5 cursor-pointer'
                                     ]"
                                 >
@@ -121,7 +121,7 @@
                     <aside class="lg:col-span-4 w-full lg:sticky lg:top-8">
                         <div class="bg-surface-container rounded-2xl p-7 border border-outline-variant shadow-[0_10px_40px_rgba(0,0,0,0.5)] space-y-6">
                             <div class="flex gap-4">
-                                <div class="w-20 h-28 flex-shrink-0 rounded-xl overflow-hidden bg-surface-container-high border border-outline-variant">
+                                <div class="w-20 h-28 shrink-0 rounded-xl overflow-hidden bg-surface-container-high border border-outline-variant">
                                     <img class="w-full h-full object-cover" :src="getImageUrl(session.film?.image)" :alt="session.film?.title" />
                                 </div>
                                 <div class="min-w-0">
@@ -176,7 +176,7 @@
                             <button
                                 @click="proceedToPayment"
                                 :disabled="!selectedSeats.length"
-                                class="w-full gold-gradient min-h-[48px] py-4 rounded-xl font-bold text-xs uppercase tracking-[0.2em] hover:brightness-105 transition-all shadow-lg active:scale-[0.98] cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed disabled:active:scale-100"
+                                class="w-full blue-gradient min-h-[48px] py-4 rounded-xl font-bold text-xs uppercase tracking-[0.2em] hover:brightness-105 transition-all shadow-lg active:scale-[0.98] cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed disabled:active:scale-100"
                             >
                                 Proceed to payment
                             </button>
@@ -283,7 +283,7 @@
                     <button
                         @click="confirmBooking"
                         :disabled="!paymentMethod || booking"
-                        class="flex-1 gold-gradient min-h-[48px] py-4 rounded-xl font-bold uppercase tracking-[0.18em] text-xs transition-all shadow-lg active:scale-[0.98] cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed disabled:active:scale-100 flex items-center justify-center gap-2"
+                        class="flex-1 blue-gradient min-h-[48px] py-4 rounded-xl font-bold uppercase tracking-[0.18em] text-xs transition-all shadow-lg active:scale-[0.98] cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed disabled:active:scale-100 flex items-center justify-center gap-2"
                     >
                         <span v-if="booking" class="animate-spin rounded-full h-4 w-4 border-2 border-on-primary border-t-transparent" aria-hidden="true"></span>
                         {{ booking ? 'Authorizing…' : 'Authorize payment' }}
@@ -295,7 +295,7 @@
             <div v-else-if="step === 'success'" class="max-w-lg mx-auto px-5 mt-12 sm:mt-20">
                 <div class="ticket-card relative bg-surface-container rounded-3xl border border-outline-variant shadow-[0_10px_50px_rgba(0,0,0,0.55)] overflow-hidden text-center">
                     <div class="p-10 space-y-5">
-                        <div class="success-check w-20 h-20 gold-gradient rounded-full flex items-center justify-center mx-auto shadow-lg shadow-primary/30">
+                        <div class="success-check w-20 h-20 blue-gradient rounded-full flex items-center justify-center mx-auto shadow-lg shadow-primary/30">
                             <span class="material-symbols-outlined text-[40px]" aria-hidden="true">check</span>
                         </div>
                         <div class="space-y-2">
@@ -313,7 +313,7 @@
                     </div>
                 </div>
                 <div class="flex flex-col sm:flex-row gap-4 justify-center mt-8">
-                    <router-link to="/profile" class="px-8 min-h-[48px] py-4 gold-gradient rounded-xl font-bold uppercase tracking-[0.18em] text-xs shadow-lg shadow-primary/25 transition-all hover:brightness-105 flex items-center justify-center gap-2">
+                    <router-link to="/profile" class="px-8 min-h-[48px] py-4 blue-gradient rounded-xl font-bold uppercase tracking-[0.18em] text-xs shadow-lg shadow-primary/25 transition-all hover:brightness-105 flex items-center justify-center gap-2">
                         <span class="material-symbols-outlined text-[18px]" aria-hidden="true">local_activity</span>
                         Go to tickets
                     </router-link>
@@ -482,8 +482,8 @@ onMounted(() => {
     width: 100%;
     height: 6px;
     border-radius: 999px;
-    background: linear-gradient(90deg, transparent, rgba(212, 160, 23, 0.85), transparent);
-    box-shadow: 0 0 18px rgba(212, 160, 23, 0.55);
+    background: linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.85), transparent);
+    box-shadow: 0 0 18px rgba(59, 130, 246, 0.55);
     transform: perspective(420px) rotateX(34deg);
 }
 .screen-glow {
@@ -492,7 +492,7 @@ onMounted(() => {
     left: 8%;
     right: 8%;
     height: 90px;
-    background: linear-gradient(to bottom, rgba(212, 160, 23, 0.22) 0%, transparent 75%);
+    background: linear-gradient(to bottom, rgba(59, 130, 246, 0.22) 0%, transparent 75%);
     clip-path: ellipse(60% 50% at 50% 0%);
     pointer-events: none;
 }

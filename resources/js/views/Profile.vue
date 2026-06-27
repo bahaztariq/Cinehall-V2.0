@@ -18,7 +18,7 @@
                             </h1>
                             <p class="text-on-surface-variant text-sm break-all mt-1">{{ user?.email }}</p>
                             <div class="flex flex-wrap gap-2 justify-center sm:justify-start pt-3">
-                                <span v-if="user?.is_admin" class="chip chip-gold">
+                                <span v-if="user?.is_admin" class="chip chip-blue">
                                     <span class="material-symbols-outlined chip-ico" aria-hidden="true">verified</span>
                                     Admin
                                 </span>
@@ -71,7 +71,7 @@
                     <h2 class="font-serif text-2xl font-bold text-on-surface">No bookings yet</h2>
                     <p class="text-on-surface-variant text-sm">Your cinema passes will appear here once you reserve a seat.</p>
                 </div>
-                <router-link to="/" class="cta-gold">
+                <router-link to="/" class="cta-blue">
                     <span class="material-symbols-outlined" aria-hidden="true">movie</span>
                     Browse Films
                 </router-link>
@@ -327,8 +327,8 @@ onMounted(fetchProfile);
     position: absolute;
     inset: 0;
     background:
-        radial-gradient(120% 140% at 12% 0%, rgba(212, 160, 23, 0.16), transparent 55%),
-        radial-gradient(80% 120% at 100% 0%, rgba(212, 160, 23, 0.07), transparent 60%);
+        radial-gradient(120% 140% at 12% 0%, rgba(59, 130, 246, 0.16), transparent 55%),
+        radial-gradient(80% 120% at 100% 0%, rgba(59, 130, 246, 0.07), transparent 60%);
     pointer-events: none;
 }
 .hero-inner {
@@ -365,8 +365,8 @@ onMounted(fetchProfile);
 .avatar-ring {
     padding: 3px;
     border-radius: 9999px;
-    background: linear-gradient(140deg, rgba(212, 160, 23, 0.8), rgba(212, 160, 23, 0.1));
-    box-shadow: 0 10px 34px -10px rgba(212, 160, 23, 0.5);
+    background: linear-gradient(140deg, rgba(59, 130, 246, 0.8), rgba(59, 130, 246, 0.1));
+    box-shadow: 0 10px 34px -10px rgba(59, 130, 246, 0.5);
 }
 .avatar {
     width: 7rem;
@@ -404,10 +404,10 @@ onMounted(fetchProfile);
     border-radius: 9999px;
     background: currentColor;
 }
-.chip-gold {
+.chip-blue {
     color: var(--color-primary);
-    background: rgba(212, 160, 23, 0.12);
-    border-color: rgba(212, 160, 23, 0.3);
+    background: rgba(59, 130, 246, 0.12);
+    border-color: rgba(59, 130, 246, 0.3);
 }
 .chip-active {
     color: #4ade80;
@@ -502,8 +502,8 @@ onMounted(fetchProfile);
 .seg-ico { font-size: 16px; }
 .seg-active {
     color: var(--color-on-primary);
-    background: linear-gradient(135deg, #f2c94c 0%, #d4a017 55%, #a47c10 100%);
-    box-shadow: 0 6px 18px -6px rgba(212, 160, 23, 0.55);
+    background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 55%, #1d4ed8 100%);
+    box-shadow: 0 6px 18px -6px rgba(59, 130, 246, 0.55);
 }
 .seg-active:hover { color: var(--color-on-primary); }
 .seg-count {
@@ -533,7 +533,7 @@ onMounted(fetchProfile);
     transition: border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
 }
 .ticket:hover {
-    border-color: rgba(212, 160, 23, 0.4);
+    border-color: rgba(59, 130, 246, 0.4);
     transform: translateY(-3px);
     box-shadow: 0 18px 42px -22px rgba(0, 0, 0, 0.75);
 }
@@ -614,8 +614,8 @@ onMounted(fetchProfile);
     font-size: 0.8rem;
     font-weight: 700;
     color: var(--color-primary);
-    background: rgba(212, 160, 23, 0.1);
-    border: 1px solid rgba(212, 160, 23, 0.28);
+    background: rgba(59, 130, 246, 0.1);
+    border: 1px solid rgba(59, 130, 246, 0.28);
 }
 .ticket-footer {
     margin-top: auto;
@@ -653,8 +653,8 @@ onMounted(fetchProfile);
 }
 .status-pending {
     color: var(--color-primary);
-    background: rgba(212, 160, 23, 0.1);
-    border-color: rgba(212, 160, 23, 0.28);
+    background: rgba(59, 130, 246, 0.1);
+    border-color: rgba(59, 130, 246, 0.28);
 }
 .status-cancelled {
     color: #f87171;
@@ -682,13 +682,13 @@ onMounted(fetchProfile);
 }
 .btn-ico { font-size: 16px; }
 .btn-download {
-    border: 1px solid rgba(212, 160, 23, 0.32);
-    background: rgba(212, 160, 23, 0.1);
+    border: 1px solid rgba(59, 130, 246, 0.32);
+    background: rgba(59, 130, 246, 0.1);
     color: var(--color-primary);
 }
 .btn-download:hover:not(:disabled) {
-    background: rgba(212, 160, 23, 0.18);
-    border-color: rgba(212, 160, 23, 0.55);
+    background: rgba(59, 130, 246, 0.18);
+    border-color: rgba(59, 130, 246, 0.55);
 }
 .btn-cancel {
     border: 1px solid rgba(248, 113, 113, 0.28);
@@ -731,24 +731,24 @@ onMounted(fetchProfile);
     font-size: 30px;
     color: var(--color-primary);
 }
-.cta-gold {
+.cta-blue {
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
     min-height: 44px;
     padding: 0 2rem;
     border-radius: 0.65rem;
-    background: linear-gradient(135deg, #f2c94c 0%, #d4a017 55%, #a47c10 100%);
+    background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 55%, #1d4ed8 100%);
     color: var(--color-on-primary);
     font-size: 12px;
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.14em;
-    box-shadow: 0 10px 26px -10px rgba(212, 160, 23, 0.5);
+    box-shadow: 0 10px 26px -10px rgba(59, 130, 246, 0.5);
     transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
-.cta-gold:hover { transform: translateY(-2px); }
-.cta-gold .material-symbols-outlined { font-size: 18px; }
+.cta-blue:hover { transform: translateY(-2px); }
+.cta-blue .material-symbols-outlined { font-size: 18px; }
 
 .alert {
     display: flex;

@@ -18,7 +18,7 @@
                 </div>
                 <div class="ticket-divider" aria-hidden="true"></div>
                 <div class="px-10 py-7 bg-surface-container-low flex justify-center">
-                    <router-link to="/" class="px-8 min-h-[48px] py-4 gold-gradient rounded-xl font-bold uppercase tracking-[0.18em] text-xs shadow-lg shadow-primary/25 transition-all hover:brightness-105 flex items-center justify-center gap-2">
+                    <router-link to="/" class="px-8 min-h-[48px] py-4 blue-gradient rounded-xl font-bold uppercase tracking-[0.18em] text-xs shadow-lg shadow-primary/25 transition-all hover:brightness-105 flex items-center justify-center gap-2">
                         <span class="material-symbols-outlined text-[18px]" aria-hidden="true">home</span>
                         Back to home
                     </router-link>
@@ -41,7 +41,7 @@
             <!-- ════════ Success ════════ -->
             <div v-else-if="state === 'success'" class="ticket-card relative bg-surface-container rounded-3xl border border-outline-variant shadow-[0_10px_50px_rgba(0,0,0,0.55)] overflow-hidden text-center">
                 <div class="p-10 space-y-5">
-                    <div class="success-check w-20 h-20 gold-gradient rounded-full flex items-center justify-center mx-auto shadow-lg shadow-primary/30">
+                    <div class="success-check w-20 h-20 blue-gradient rounded-full flex items-center justify-center mx-auto shadow-lg shadow-primary/30">
                         <span class="material-symbols-outlined text-[40px]" aria-hidden="true">check</span>
                     </div>
                     <div class="space-y-2">
@@ -59,7 +59,7 @@
                             :key="id"
                             @click="downloadTicket(id)"
                             :disabled="downloading.includes(id)"
-                            class="w-full gold-gradient min-h-[48px] py-4 rounded-xl font-bold uppercase tracking-[0.18em] text-xs shadow-lg transition-all hover:brightness-105 active:scale-[0.98] cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                            class="w-full blue-gradient min-h-[48px] py-4 rounded-xl font-bold uppercase tracking-[0.18em] text-xs shadow-lg transition-all hover:brightness-105 active:scale-[0.98] cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                         >
                             <span v-if="downloading.includes(id)" class="animate-spin rounded-full h-4 w-4 border-2 border-on-primary border-t-transparent" aria-hidden="true"></span>
                             <span v-else class="material-symbols-outlined text-[18px]" aria-hidden="true">download</span>
@@ -100,7 +100,7 @@
                 </div>
                 <div class="ticket-divider" aria-hidden="true"></div>
                 <div class="px-8 py-6 bg-surface-container-low flex flex-col sm:flex-row gap-3 justify-center">
-                    <router-link to="/" class="px-7 min-h-[48px] py-4 gold-gradient rounded-xl font-bold uppercase tracking-[0.18em] text-xs shadow-lg shadow-primary/25 transition-all hover:brightness-105 flex items-center justify-center gap-2">
+                    <router-link to="/" class="px-7 min-h-[48px] py-4 blue-gradient rounded-xl font-bold uppercase tracking-[0.18em] text-xs shadow-lg shadow-primary/25 transition-all hover:brightness-105 flex items-center justify-center gap-2">
                         <span class="material-symbols-outlined text-[18px]" aria-hidden="true">home</span>
                         Back to home
                     </router-link>
