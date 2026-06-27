@@ -85,7 +85,7 @@
                             <span
                                 class="rank-badge"
                                 :class="[
-                                    index === 0 ? 'rank-gold' : '',
+                                    index === 0 ? 'rank-blue' : '',
                                     index === 1 ? 'rank-silver' : '',
                                     index === 2 ? 'rank-bronze' : '',
                                     index > 2 ? 'rank-plain' : ''
@@ -191,7 +191,7 @@ onMounted(fetchStats);
     transition: border-color 0.2s ease, transform 0.2s ease;
 }
 .stat-card:hover {
-    border-color: rgba(212, 160, 23, 0.35);
+    border-color: rgba(59, 130, 246, 0.35);
     transform: translateY(-2px);
 }
 
@@ -215,8 +215,8 @@ onMounted(fetchStats);
     flex-shrink: 0;
     font-variant-numeric: tabular-nums;
 }
-.rank-gold {
-    background: linear-gradient(135deg, #f2c94c 0%, #d4a017 100%);
+.rank-blue {
+    background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%);
     color: var(--color-on-primary);
 }
 .rank-silver {
@@ -256,7 +256,7 @@ onMounted(fetchStats);
     transition: border-color 0.2s ease, transform 0.2s ease, background-color 0.2s ease;
 }
 .nav-card:hover {
-    border-color: rgba(212, 160, 23, 0.45);
+    border-color: rgba(59, 130, 246, 0.45);
     transform: translateY(-2px);
 }
 
@@ -267,7 +267,7 @@ onMounted(fetchStats);
     width: 2.5rem;
     height: 2.5rem;
     border-radius: 0.75rem;
-    background: rgba(212, 160, 23, 0.1);
+    background: rgba(59, 130, 246, 0.1);
     color: var(--color-primary);
     flex-shrink: 0;
 }

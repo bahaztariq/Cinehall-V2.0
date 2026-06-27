@@ -76,7 +76,7 @@
                 <h1 class="font-serif text-lg sm:text-xl font-bold">{{ currentLabel }}</h1>
                 <div class="ml-auto flex items-center gap-2">
                     <span class="text-xs text-on-surface-variant hidden sm:inline">{{ auth.user?.name }}</span>
-                    <span class="w-8 h-8 rounded-full gold-gradient flex items-center justify-center text-xs font-black uppercase">{{ initial }}</span>
+                    <span class="w-8 h-8 rounded-full blue-gradient flex items-center justify-center text-xs font-black uppercase">{{ initial }}</span>
                 </div>
             </header>
 
